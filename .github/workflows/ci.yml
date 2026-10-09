@@ -51,7 +51,13 @@ jobs:
         run: npm run web:lint
 
       - name: Test
-        run: npm run web:test:ci
+        run: npm run web:test
+
+      - name: Build WebAssembly generator
+        run: npm run wasm:build
+
+      - name: Test WebAssembly generator
+        run: npm run wasm:test
 
       - name: Build for GitHub Pages
         run: npm run web:build:pages
