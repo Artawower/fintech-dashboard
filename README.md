@@ -4,6 +4,7 @@
 ## Links
 
 - [Specification](./docs/spec.md)
+- [Github Page](https://artawower.github.io/fintech-dashboard/)
 
 ## Installation
 
