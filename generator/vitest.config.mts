@@ -6,5 +6,10 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['test/**/*.spec.ts'],
+    typecheck: {
+      enabled: true,
+      include: ['test/**/*.spec.ts'],
+      tsconfig: 'test/tsconfig.json',
+    },
   },
 });
