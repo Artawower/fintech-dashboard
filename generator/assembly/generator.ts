@@ -1,5 +1,6 @@
 import { MarketUpdate } from './market-update.model';
 import { GeneratorConfig } from './generator-config';
+import { generateInstrument, randIntRange } from './utils';
 
 @final
 export class Generator {
@@ -26,19 +27,7 @@ export class Generator {
     this.instruments = new Array<string>(this.config.instrumentCount);
 
     for (let i: i32 = 0; i < this.instruments.length; i++) {
-      this.instruments[i] = this.generateInstrument();
+      this.instruments[i] = generateInstrument(this.config.instrumentLength);
     }
-  }
-
-  private generateInstrument(): string {
-    let code = '';
-    const minCode = 'A'.charCodeAt(0);
-    const maxCode = 'Z'.charCodeAt(0);
-
-    for (let i: i8 = 0; i < this.config.instrumentLength; i++) {
-      code += String.fromCharCode(getRadomInRange(minCode, maxCode));
-    }
-
-    return code;
   }
 }
