@@ -1,5 +1,4 @@
----
-name: CI
+name: CI and deployment
 
 on:
   pull_request:
@@ -12,8 +11,25 @@ permissions:
   contents: read
 
 jobs:
-  verify:
+  conventional-commits:
+    name: Validate Conventional Commits
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Lint commit messages
+        uses: wagoid/commitlint-github-action@v6
+
+  quality:
     name: Lint, test, and build
+    needs: conventional-commits
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -37,5 +53,31 @@ jobs:
       - name: Test
         run: npm run web:test:ci
 
-      - name: Build
-        run: npm run web:build
+      - name: Build for GitHub Pages
+        run: npm run web:build:pages
+
+      - name: Upload GitHub Pages artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: web/dist/fintech-dashboard/browser
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: quality
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: github-pages
+      cancel-in-progress: false
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
