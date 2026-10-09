@@ -1,6 +1,7 @@
-import { beforeEach, expect, test } from 'vitest';
-import { generate } from '../build/release';
+import { test } from 'vitest';
+import { loadGenerator } from './load-generator';
 
-test('Should run script generation without errors', async () => {
-  generate(1, 2);
+test('Should initialize generator with seed and instruments count', async () => {
+  const { init } = await loadGenerator(27);
+  init(50);
 });
