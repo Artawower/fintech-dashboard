@@ -1,14 +1,28 @@
-import { beforeEach, expect, test } from 'vitest';
+import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { init as initWithSeed, generate, getInstruments } from '../build/release';
+import {
+  DEFAULT_MAX_NEXT_SPREAD,
+  DEFAULT_MAX_PERCENT_DIFF,
+  DEFAULT_MAX_TRADE_QUANTITY,
+  DEFAULT_MIN_NEXT_SPREAD,
+  DEFAULT_MIN_TRADE_QUANTITY,
+} from '../assembly/constants';
 
 const seed = 27;
 const defaultInstrumentCount = 10;
-const testBatchSizes = [0, 5, 10, 20, 50, 100];
+const fixedTimestamp = new Date('2025-01-01T00:00:00.000Z').getTime();
+const testBatchSizes = [0, 1, 5, 10, 20, 50, 100, 1000];
 
 const init = (instrumentCount: number) => initWithSeed(instrumentCount, seed);
 
 beforeEach(() => {
+  vi.useFakeTimers();
+  vi.setSystemTime(fixedTimestamp);
   init(defaultInstrumentCount);
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 test('Should generate required number of instruments', () => {
@@ -45,10 +59,22 @@ test('Should return non empty array with generated data', () => {
   });
 });
 
-test('Bid price should be less than ask', () => {
+test('Should reference initialized instruments', () => {
+  const instruments = new Set(getInstruments());
+  const updates = generate(100);
+
+  updates.forEach((update) => {
+    expect(instruments.has(update.instrument)).toBe(true);
+  });
+});
+
+test('Should generate spread within configured bounds', () => {
   const updates = generate(500);
-  updates.forEach((u) => {
-    expect(u.bidCents < u.askCents).toBeTruthy();
+  updates.forEach((update) => {
+    const spread = update.askCents - update.bidCents;
+
+    expect(spread).toBeGreaterThanOrEqual(DEFAULT_MIN_NEXT_SPREAD);
+    expect(spread).toBeLessThanOrEqual(DEFAULT_MAX_NEXT_SPREAD);
   });
 });
 
@@ -56,6 +82,17 @@ test('Should generate trade price as bid or ask', () => {
   const updates = generate(100);
   updates.forEach((update) => {
     expect([update.bidCents, update.askCents]).toContain(update.priceCents);
+  });
+});
+
+test('Should generate positive prices', () => {
+  const updates = generate(100);
+
+  updates.forEach((update) => {
+    expect(update.lastPriceCents).toBeGreaterThan(0);
+    expect(update.bidCents).toBeGreaterThan(0);
+    expect(update.askCents).toBeGreaterThan(0);
+    expect(update.priceCents).toBeGreaterThan(0);
   });
 });
 
@@ -73,8 +110,8 @@ test('Should generate trade quantity within configured bounds', () => {
   const updates = generate(100);
 
   updates.forEach((update) => {
-    expect(update.tradeQuantity).toBeGreaterThanOrEqual(1);
-    expect(update.tradeQuantity).toBeLessThanOrEqual(5000);
+    expect(update.tradeQuantity).toBeGreaterThanOrEqual(DEFAULT_MIN_TRADE_QUANTITY);
+    expect(update.tradeQuantity).toBeLessThanOrEqual(DEFAULT_MAX_TRADE_QUANTITY);
   });
 });
 
@@ -82,9 +119,30 @@ test('Should limit bid price change to 15 percent', () => {
   const updates = generate(100);
 
   updates.forEach((update) => {
-    const maxChange = Math.round(update.lastPriceCents * 0.15);
+    const maxChange = Math.round((update.lastPriceCents * DEFAULT_MAX_PERCENT_DIFF) / 100);
     const actualChange = Math.abs(update.bidCents - update.lastPriceCents);
 
     expect(actualChange).toBeLessThanOrEqual(maxChange);
   });
+});
+
+test('Should use fixed timestamp for generated updates', () => {
+  const updates = generate(100);
+
+  updates.forEach((update) => {
+    expect(update.time).toBe(BigInt(fixedTimestamp));
+  });
+});
+
+test('Should generate same market updates with same seed', () => {
+  const firstRun = generate(100);
+  init(defaultInstrumentCount);
+  const secondRun = generate(100);
+
+  expect(secondRun).toEqual(firstRun);
+});
+
+test('Generated updates should match the previous snapshot', () => {
+  const updates = generate(30);
+  expect(updates).toMatchSnapshot();
 });
