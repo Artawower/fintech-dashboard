@@ -146,3 +146,40 @@ test('Generated updates should match the previous snapshot', () => {
   const updates = generate(30);
   expect(updates).toMatchSnapshot();
 });
+
+test('Should use previous trade price for next update of same instrument', () => {
+  init(1);
+  const [firstUpdate, secondUpdate] = generate(2);
+
+  expect(secondUpdate.instrument).toBe(firstUpdate.instrument);
+  expect(secondUpdate.lastPriceCents).toBe(firstUpdate.priceCents);
+});
+
+test('Should keep previous trade price between generated batches', () => {
+  init(1);
+  const [firstUpdate] = generate(1);
+  const [secondUpdate] = generate(1);
+
+  expect(secondUpdate.lastPriceCents).toBe(firstUpdate.priceCents);
+});
+
+test('Should keep separate price history for each instrument', () => {
+  init(2);
+  const updates = generate(100);
+  const previousPrices: { [key: string]: number } = {};
+  let repeatedUpdates = 0;
+
+  updates.forEach((update) => {
+    const previousPrice = previousPrices[update.instrument];
+
+    if (previousPrice !== undefined) {
+      repeatedUpdates += 1;
+      expect(update.lastPriceCents).toBe(previousPrice);
+    }
+
+    previousPrices[update.instrument] = update.priceCents;
+  });
+
+  expect(Object.keys(previousPrices).length).toBeGreaterThan(1);
+  expect(repeatedUpdates).toBeGreaterThan(0);
+});

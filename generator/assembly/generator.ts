@@ -60,6 +60,7 @@ export class Generator {
       askQuantity,
     };
 
+    this.saveMarketUpdate(update);
     return update;
   }
 
@@ -85,5 +86,9 @@ export class Generator {
     const nextPrice = price + changeDiffCents;
 
     return nextPrice;
+  }
+
+  private saveMarketUpdate(update: MarketUpdate): void {
+    this.history.set(update.instrument, update);
   }
 }
