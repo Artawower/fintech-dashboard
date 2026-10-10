@@ -1,0 +1,101 @@
+<form class="grid gap-6 md:grid-cols-2" [formGroup]="settingsForm" (ngSubmit)="applySettings()">
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">Instrument count</legend>
+    <input
+      class="input w-full"
+      id="instrument-count"
+      name="instrumentCount"
+      type="number"
+      [min]="limits.instrumentCount.min"
+      [max]="limits.instrumentCount.max"
+      [class.input-error]="controls.instrumentCount.invalid && (controls.instrumentCount.dirty || controls.instrumentCount.touched)"
+      [attr.aria-invalid]="controls.instrumentCount.invalid && (controls.instrumentCount.dirty || controls.instrumentCount.touched)"
+      step="1"
+      formControlName="instrumentCount"
+      aria-describedby="instrument-count-help instrument-count-error"
+    />
+    <p class="label" id="instrument-count-help">
+      Allowed range: {{ limits.instrumentCount.min }}–{{ limits.instrumentCount.max }} instruments.
+    </p>
+    @if (controls.instrumentCount.invalid && (controls.instrumentCount.dirty || controls.instrumentCount.touched)) {
+      <p class="label text-error" id="instrument-count-error" role="alert">
+        @if (controls.instrumentCount.hasError('required')) {
+          Instrument count is required.
+        } @else if (controls.instrumentCount.hasError('min')) {
+          Instrument count must be at least {{ limits.instrumentCount.min }}.
+        } @else if (controls.instrumentCount.hasError('max')) {
+          Instrument count must not exceed {{ limits.instrumentCount.max }}.
+        }
+      </p>
+    }
+  </fieldset>
+
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">Updates per batch</legend>
+    <input
+      class="input w-full"
+      id="updates-per-batch"
+      name="updatesPerBatch"
+      type="number"
+      [min]="limits.updatesPerBatch.min"
+      [max]="limits.updatesPerBatch.max"
+      [class.input-error]="controls.updatesPerBatch.invalid && (controls.updatesPerBatch.dirty || controls.updatesPerBatch.touched)"
+      [attr.aria-invalid]="controls.updatesPerBatch.invalid && (controls.updatesPerBatch.dirty || controls.updatesPerBatch.touched)"
+      step="1"
+      formControlName="updatesPerBatch"
+      aria-describedby="updates-per-batch-help updates-per-batch-error"
+    />
+    <p class="label" id="updates-per-batch-help">
+      Allowed range: {{ limits.updatesPerBatch.min }}–{{ limits.updatesPerBatch.max }} updates.
+    </p>
+    @if (controls.updatesPerBatch.invalid && (controls.updatesPerBatch.dirty || controls.updatesPerBatch.touched)) {
+      <p class="label text-error" id="updates-per-batch-error" role="alert">
+        @if (controls.updatesPerBatch.hasError('required')) {
+          Updates per batch is required.
+        } @else if (controls.updatesPerBatch.hasError('min')) {
+          Updates per batch must be at least {{ limits.updatesPerBatch.min }}.
+        } @else if (controls.updatesPerBatch.hasError('max')) {
+          Updates per batch must not exceed {{ limits.updatesPerBatch.max }}.
+        }
+      </p>
+    }
+  </fieldset>
+
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">Batch interval</legend>
+    <label class="join w-full">
+      <input
+        class="input join-item w-full"
+        id="update-interval"
+        name="updateIntervalMs"
+        type="number"
+        [min]="limits.updateIntervalMs.min"
+        [max]="limits.updateIntervalMs.max"
+        [class.input-error]="controls.updateIntervalMs.invalid && (controls.updateIntervalMs.dirty || controls.updateIntervalMs.touched)"
+        [attr.aria-invalid]="controls.updateIntervalMs.invalid && (controls.updateIntervalMs.dirty || controls.updateIntervalMs.touched)"
+        step="1"
+        formControlName="updateIntervalMs"
+        aria-describedby="update-interval-help update-interval-error"
+      />
+      <span class="btn join-item" aria-hidden="true">ms</span>
+    </label>
+    <p class="label" id="update-interval-help">
+      Allowed range: {{ limits.updateIntervalMs.min }}–{{ limits.updateIntervalMs.max }} ms.
+    </p>
+    @if (controls.updateIntervalMs.invalid && (controls.updateIntervalMs.dirty || controls.updateIntervalMs.touched)) {
+      <p class="label text-error" id="update-interval-error" role="alert">
+        @if (controls.updateIntervalMs.hasError('required')) {
+          Batch interval is required.
+        } @else if (controls.updateIntervalMs.hasError('min')) {
+          Batch interval must be at least {{ limits.updateIntervalMs.min }} ms.
+        } @else if (controls.updateIntervalMs.hasError('max')) {
+          Batch interval must not exceed {{ limits.updateIntervalMs.max }} ms.
+        }
+      </p>
+    }
+  </fieldset>
+
+  <div class="flex justify-end md:col-span-2">
+    <button class="btn btn-primary" type="submit" [disabled]="settingsForm.invalid">Apply</button>
+  </div>
+</form>

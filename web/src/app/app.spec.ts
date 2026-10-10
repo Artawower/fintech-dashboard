@@ -27,7 +27,7 @@ describe('App', () => {
     expect(element.textContent).toContain('Dashboard page placeholder');
   });
 
-  it('should navigate to the settings placeholder and mark its route active', async () => {
+  it('should navigate to the settings form and mark its route active', async () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
     const router = TestBed.inject(Router);
@@ -36,7 +36,8 @@ describe('App', () => {
     fixture.detectChanges();
 
     const element = fixture.nativeElement as HTMLElement;
-    expect(element.textContent).toContain('Settings page placeholder');
+    expect(element.textContent).toContain('Instrument count');
+    expect(element.querySelector('input[name="instrumentCount"]')).toBeTruthy();
     expect(element.querySelector('a.menu-active[href="/settings"]')).toBeTruthy();
   });
 });

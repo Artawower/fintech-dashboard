@@ -1,4 +1,3 @@
-
 # Fintech Dashboard
 
 ## Links
@@ -9,15 +8,14 @@
 ## Installation
 
 Node.js 24 is required.
+
 ```bash
 git clone https://github.com/Artawower/fintech-dashboard.git
 cd fintech-dashboard
 npm ci
 ```
 
-
 ## Run
-
 
 ## Technologies
 
