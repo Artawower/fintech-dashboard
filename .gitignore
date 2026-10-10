@@ -12,6 +12,9 @@
 **/node_modules/*
 yarn.lock
 
+# Generated WebAssembly assets
+/web/public/wasm/
+
 # Environment files
 /.env
 

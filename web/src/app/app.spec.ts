@@ -1,14 +1,32 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { afterEach, beforeEach, vi } from 'vitest';
 import { App } from './app';
 import { appConfig } from './app.config';
+import { MockMarketWorker } from '../../test-utils/mock-market-worker';
+
+afterEach(() => {
+  TestBed.resetTestingModule();
+  vi.unstubAllGlobals();
+});
 
 describe('App', () => {
   beforeEach(async () => {
+    MockMarketWorker.instances = [];
+    vi.stubGlobal('Worker', MockMarketWorker);
     await TestBed.configureTestingModule({
       imports: [App],
       providers: appConfig.providers,
     }).compileComponents();
+  });
+
+  it('starts the market feed when the app initializes', () => {
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+    expect(MockMarketWorker.instances).toHaveLength(1);
+    const worker = MockMarketWorker.instances[0];
+    expect(worker.postMessage).toHaveBeenCalledTimes(1);
+    expect(worker.postMessage).toHaveBeenCalledWith(expect.objectContaining({ type: 'INIT' }));
   });
 
   it('should render the application navigation and dashboard by default with hash routing', async () => {
