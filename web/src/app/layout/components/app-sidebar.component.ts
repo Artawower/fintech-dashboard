@@ -8,5 +8,5 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   templateUrl: './app-sidebar.component.html',
 })
 export class AppSidebar {
-  readonly navigationSelected = output<void>();
+  public readonly navigationSelected = output<void>();
 }

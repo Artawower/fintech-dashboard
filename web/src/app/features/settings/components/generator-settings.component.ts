@@ -17,7 +17,7 @@ export class GeneratorSettings {
 
   protected readonly limits = SETTINGS_LIMITS;
 
-  readonly settingsForm = this.formBuilder.nonNullable.group({
+  public readonly settingsForm = this.formBuilder.nonNullable.group({
     instrumentCount: [
       this.settingsService.settings().instrumentCount,
       [

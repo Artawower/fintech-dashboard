@@ -21,12 +21,12 @@ import { NumberField } from './number-field.component';
   `,
 })
 class TestHost {
-  readonly control = new FormControl<number>(20, {
+  public readonly control = new FormControl<number>(20, {
     nonNullable: true,
     validators: [Validators.required, integerValidator, Validators.min(10), Validators.max(100)],
   });
-  suffix = '';
-  errorUnit = '';
+  public suffix = '';
+  public errorUnit = '';
 }
 
 describe('NumberField', () => {

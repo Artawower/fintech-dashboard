@@ -11,16 +11,16 @@ import { startWith, switchMap } from 'rxjs';
   templateUrl: './number-field.component.html',
 })
 export class NumberField {
-  readonly inputId = input.required<string>();
-  readonly inputName = input.required<string>();
-  readonly label = input.required<string>();
-  readonly control = input.required<FormControl<number>>();
-  readonly min = input.required<number>();
-  readonly max = input.required<number>();
-  readonly step = input<number>(1);
-  readonly rangeUnit = input<string>('');
-  readonly errorUnit = input<string>('');
-  readonly suffix = input<string>('');
+  public readonly inputId = input.required<string>();
+  public readonly inputName = input.required<string>();
+  public readonly label = input.required<string>();
+  public readonly control = input.required<FormControl<number>>();
+  public readonly min = input.required<number>();
+  public readonly max = input.required<number>();
+  public readonly step = input<number>(1);
+  public readonly rangeUnit = input<string>('');
+  public readonly errorUnit = input<string>('');
+  public readonly suffix = input<string>('');
 
   protected readonly labelId = computed(() => `${this.inputId()}-label`);
   protected readonly helpId = computed(() => `${this.inputId()}-help`);

@@ -6,8 +6,8 @@ import { PROJECT_NAME } from '../core/constants';
   templateUrl: './app-header.component.html',
 })
 export class AppHeader {
-  readonly isNavigationOpen = input.required<boolean>();
-  readonly openNavigation = output<void>();
+  public readonly isNavigationOpen = input.required<boolean>();
+  public readonly openNavigation = output<void>();
 
   protected readonly projectName = PROJECT_NAME;
 }

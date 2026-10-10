@@ -15,6 +15,7 @@ module.exports = defineConfig([
     ],
     processor: angular.processInlineTemplates,
     rules: {
+      '@typescript-eslint/explicit-member-accessibility': ['error', { accessibility: 'explicit' }],
       '@angular-eslint/directive-selector': [
         'error',
         {
