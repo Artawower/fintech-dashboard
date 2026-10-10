@@ -1,12 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { vi } from 'vitest';
 import { DEFAULT_MARKET_SETTINGS } from '../../../core/constants';
+import { SettingsService } from '../../../core/services/settings.service';
 import { SETTINGS_LIMITS } from '../settings.constants';
 import { GeneratorSettings } from './generator-settings.component';
 
 describe('GeneratorSettings', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({ imports: [GeneratorSettings] }).compileComponents();
+    TestBed.inject(SettingsService).resetToDefault();
   });
 
   afterEach(() => vi.restoreAllMocks());
@@ -106,21 +108,36 @@ describe('GeneratorSettings', () => {
     }
   });
 
-  it('should log the current settings when they are applied', () => {
-    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+  it('should update SettingsService when settings are applied', () => {
     const fixture = TestBed.createComponent(GeneratorSettings);
+    const settingsService = TestBed.inject(SettingsService);
     fixture.detectChanges();
 
     fixture.componentInstance.settingsForm.controls.instrumentCount.setValue(8);
-    expect(log).not.toHaveBeenCalled();
 
-    const element = fixture.nativeElement as HTMLElement; console.log(element.innerHTML);
+    const element = fixture.nativeElement as HTMLElement;
     const form = element.querySelector<HTMLFormElement>('form');
     form!.dispatchEvent(new Event('submit'));
 
-    expect(log).toHaveBeenCalledWith('Settings applied:', {
+    expect(settingsService.settings()).toEqual({
       ...DEFAULT_MARKET_SETTINGS,
       instrumentCount: 8,
+    });
+  });
+
+  it('should initialize form with current settings from SettingsService', () => {
+    const settingsService = TestBed.inject(SettingsService);
+    settingsService.updateSettings({
+      instrumentCount: 12,
+      updatesPerBatch: 250,
+      updateIntervalMs: 800,
+    });
+
+    const fixture = TestBed.createComponent(GeneratorSettings);
+    expect(fixture.componentInstance.settingsForm.getRawValue()).toEqual({
+      instrumentCount: 12,
+      updatesPerBatch: 250,
+      updateIntervalMs: 800,
     });
   });
 });

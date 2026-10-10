@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NumberField } from '../../../shared/components/number-field.component';
 import { integerValidator } from '../../../shared/validators/integer.validator';
-import { DEFAULT_MARKET_SETTINGS } from '../../../core/constants';
+import { SettingsService } from '../../../core/services/settings.service';
 import { MarketSettings } from '../../../core/models/market-settings.model';
 import { SETTINGS_LIMITS } from '../settings.constants';
 
@@ -13,12 +13,13 @@ import { SETTINGS_LIMITS } from '../settings.constants';
 })
 export class GeneratorSettings {
   private readonly formBuilder = inject(FormBuilder);
+  private readonly settingsService = inject(SettingsService);
 
   protected readonly limits = SETTINGS_LIMITS;
 
   readonly settingsForm = this.formBuilder.nonNullable.group({
     instrumentCount: [
-      DEFAULT_MARKET_SETTINGS.instrumentCount,
+      this.settingsService.settings().instrumentCount,
       [
         Validators.required,
         integerValidator,
@@ -27,7 +28,7 @@ export class GeneratorSettings {
       ],
     ],
     updatesPerBatch: [
-      DEFAULT_MARKET_SETTINGS.updatesPerBatch,
+      this.settingsService.settings().updatesPerBatch,
       [
         Validators.required,
         integerValidator,
@@ -36,7 +37,7 @@ export class GeneratorSettings {
       ],
     ],
     updateIntervalMs: [
-      DEFAULT_MARKET_SETTINGS.updateIntervalMs,
+      this.settingsService.settings().updateIntervalMs,
       [
         Validators.required,
         integerValidator,
@@ -54,6 +55,6 @@ export class GeneratorSettings {
     }
 
     const settings: MarketSettings = this.settingsForm.getRawValue();
-    console.log('Settings applied:', settings);
+    this.settingsService.updateSettings(settings);
   }
 }
