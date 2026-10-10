@@ -40,6 +40,13 @@ test('Should generate instruments with string labels', () => {
   });
 });
 
+test('Should generate unique instrument labels', () => {
+  initWithSeed(50, 102);
+  const instruments = getInstruments();
+
+  expect(new Set(instruments).size).toBe(instruments.length);
+});
+
 test('Should return same random instruments each run', () => {
   init(50);
   expect(getInstruments()).toMatchSnapshot();

@@ -20,11 +20,13 @@ export class Generator {
   }
 
   private initInstruments(): void {
-    this.instruments = new Array<string>(this.config.instrumentCount);
+    const instruments = new Set<string>();
 
-    for (let i: i32 = 0; i < this.instruments.length; i++) {
-      this.instruments[i] = generateInstrument(this.config.instrumentLength);
+    while (instruments.size < this.config.instrumentCount) {
+      instruments.add(generateInstrument(this.config.instrumentLength));
     }
+
+    this.instruments = instruments.values();
   }
 
   public generate(batchSize: i32): MarketUpdate[] {
