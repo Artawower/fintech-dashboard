@@ -73,6 +73,7 @@ export class MarketFeedService {
   }
 
   private handleMessage(message: WorkerOutboundMessage): void {
+    console.log('✎: [line 76][market-feed.service.ts] message:: ', message);
     if (message.runId !== this.currentRunId) return;
     if (message.type === 'ERROR') {
       this.fail(message.error);

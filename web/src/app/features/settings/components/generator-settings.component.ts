@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { NumberField } from '../../../shared/components/number-field.component';
 import { integerValidator } from '../../../shared/validators/integer.validator';
 import { SettingsService } from '../../../core/services/settings.service';
@@ -14,6 +15,7 @@ import { SETTINGS_LIMITS } from '../settings.constants';
 export class GeneratorSettings {
   private readonly formBuilder = inject(FormBuilder);
   private readonly settingsService = inject(SettingsService);
+  private readonly router = inject(Router);
 
   protected readonly limits = SETTINGS_LIMITS;
 
@@ -56,5 +58,6 @@ export class GeneratorSettings {
 
     const settings: MarketSettings = this.settingsForm.getRawValue();
     this.settingsService.updateSettings(settings);
+    void this.router.navigate(['/dashboard']);
   }
 }

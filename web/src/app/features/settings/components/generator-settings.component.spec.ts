@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { Router } from '@angular/router';
 import { vi } from 'vitest';
 import { DEFAULT_MARKET_SETTINGS } from '../../../core/constants';
 import { SettingsService } from '../../../core/services/settings.service';
@@ -6,8 +7,14 @@ import { SETTINGS_LIMITS } from '../settings.constants';
 import { GeneratorSettings } from './generator-settings.component';
 
 describe('GeneratorSettings', () => {
+  let navigate: ReturnType<typeof vi.fn>;
+
   beforeEach(async () => {
-    await TestBed.configureTestingModule({ imports: [GeneratorSettings] }).compileComponents();
+    navigate = vi.fn().mockResolvedValue(true);
+    await TestBed.configureTestingModule({
+      imports: [GeneratorSettings],
+      providers: [{ provide: Router, useValue: { navigate } }],
+    }).compileComponents();
     TestBed.inject(SettingsService).resetToDefault();
   });
 
@@ -123,6 +130,20 @@ describe('GeneratorSettings', () => {
       ...DEFAULT_MARKET_SETTINGS,
       instrumentCount: 8,
     });
+    expect(navigate).toHaveBeenCalledWith(['/dashboard']);
+  });
+
+  it('should not navigate when invalid settings are applied', () => {
+    const fixture = TestBed.createComponent(GeneratorSettings);
+    fixture.componentInstance.settingsForm.controls.instrumentCount.setValue(
+      SETTINGS_LIMITS.instrumentCount.max + 1,
+    );
+
+    fixture.detectChanges();
+    const form = (fixture.nativeElement as HTMLElement).querySelector<HTMLFormElement>('form');
+    form!.dispatchEvent(new Event('submit'));
+
+    expect(navigate).not.toHaveBeenCalled();
   });
 
   it('should initialize form with current settings from SettingsService', () => {

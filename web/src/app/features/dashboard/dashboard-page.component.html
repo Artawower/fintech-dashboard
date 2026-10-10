@@ -1,6 +1,23 @@
-<section class="card bg-base-100 shadow">
+<section class="card bg-base-100 shadow" aria-labelledby="dashboard-title">
   <div class="card-body">
-    <h1 class="card-title">Dashboard</h1>
-    <p>Dashboard page placeholder</p>
+    <h1 id="dashboard-title" class="card-title">Dashboard</h1>
+
+    <div class="flex items-center gap-4">
+      <p aria-live="polite">Market feed: {{ marketFeed.status() }}</p>
+
+      @if (marketFeed.status() === 'running' || marketFeed.status() === 'paused') {
+        <button
+          type="button"
+          [class]="marketFeed.status() === 'running' ? 'btn btn-outline' : 'btn btn-primary'"
+          (click)="togglePause()"
+        >
+          {{ marketFeed.status() === 'running' ? 'Pause' : 'Resume' }}
+        </button>
+      }
+    </div>
+
+    @if (marketFeed.error(); as error) {
+      <p role="alert" class="text-error">{{ error }}</p>
+    }
   </div>
 </section>
