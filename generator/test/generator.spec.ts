@@ -20,6 +20,14 @@ beforeEach(() => {
   init(defaultInstrumentCount);
 });
 
+test('Should reject non-positive instrument count', () => {
+  expect(() => init(0)).toThrow('Instrument count should be positive');
+});
+
+test('Should reject negative batch size', () => {
+  expect(() => generate(-1)).toThrow('Batch size should not be negative');
+});
+
 test('Should generate required number of instruments', () => {
   [1, 5, 10, 20, 50].forEach((instrumentsCount) => {
     init(instrumentsCount);
