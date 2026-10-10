@@ -19,18 +19,15 @@
   "scripts": {
     "web:test": "npm run test:ci --workspace web",
     "web:lint": "npm run lint --workspace web",
-    "web:dev": "npm run start --workspace web",
-    "web:build": "npm run build --workspace web",
-    "web:build:pages": "npm run build:pages --workspace web",
+    "web:dev": "npm run wasm:build && npm run start --workspace web",
+    "web:build": "npm run wasm:build && npm run build --workspace web",
+    "web:build:pages": "npm run wasm:build && npm run build:pages --workspace web",
     "wasm:test": "npm run test --workspace generator",
-    "wasm:build": "npm run asbuild:release --workspace generator",
+    "wasm:build": "npm run asbuild:release --workspace generator && mkdir -p web/public/wasm && cp generator/build/release.js generator/build/release.wasm web/public/wasm/",
     "wasm:build:debug": "npm run asbuild:debug --workspace generator",
     "wasm:dev": "npm run start --workspace generator"
   },
-  "workspaces": [
-    "web",
-    "generator"
-  ],
+  "workspaces": ["web", "generator"],
   "engines": {
     "node": ">=24.19.0 <25"
   },
