@@ -27,8 +27,14 @@
     "wasm:build:debug": "npm run asbuild:debug --workspace generator",
     "wasm:dev": "npm run start --workspace generator"
   },
-  "workspaces": ["web", "generator"],
+  "workspaces": [
+    "web",
+    "generator"
+  ],
   "engines": {
     "node": ">=24.19.0 <25"
+  },
+  "devDependencies": {
+    "prettier": "3.9.10"
   }
 }
