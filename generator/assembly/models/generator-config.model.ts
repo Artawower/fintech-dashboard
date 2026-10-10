@@ -1,9 +1,11 @@
 import {
   DEFAULT_INSTRUMENT_LENGTH,
+  DEFAULT_MAX_BOOK_QUANTITY,
   DEFAULT_MAX_INSTRUMENT_CENT_PRICE,
   DEFAULT_MAX_NEXT_SPREAD,
   DEFAULT_MAX_PERCENT_DIFF,
   DEFAULT_MAX_TRADE_QUANTITY,
+  DEFAULT_MIN_BOOK_QUANTITY,
   DEFAULT_MIN_INSTRUMENT_CENT_PRICE,
   DEFAULT_MIN_NEXT_SPREAD,
   DEFAULT_MIN_TRADE_QUANTITY,
@@ -22,5 +24,7 @@ export class GeneratorConfig {
     public readonly maxNextSpread: i32 = DEFAULT_MAX_NEXT_SPREAD,
     public readonly minTradeQuantity: i32 = DEFAULT_MIN_TRADE_QUANTITY,
     public readonly maxTradeQuantity: i32 = DEFAULT_MAX_TRADE_QUANTITY,
+    public readonly minBookQuantity: i32 = DEFAULT_MIN_BOOK_QUANTITY,
+    public readonly maxBookQuantity: i32 = DEFAULT_MAX_BOOK_QUANTITY,
   ) {}
 }

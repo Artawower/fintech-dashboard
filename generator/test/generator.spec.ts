@@ -1,9 +1,11 @@
 import { beforeEach, expect, test } from 'vitest';
 import { init as initWithSeed, generate, getInstruments } from '../build/release';
 import {
+  DEFAULT_MAX_BOOK_QUANTITY,
   DEFAULT_MAX_NEXT_SPREAD,
   DEFAULT_MAX_PERCENT_DIFF,
   DEFAULT_MAX_TRADE_QUANTITY,
+  DEFAULT_MIN_BOOK_QUANTITY,
   DEFAULT_MIN_NEXT_SPREAD,
   DEFAULT_MIN_TRADE_QUANTITY,
 } from '../assembly/constants';
@@ -95,14 +97,23 @@ test('Should generate positive prices', () => {
   });
 });
 
-test('Should split trade quantity between bid and ask', () => {
+test('Should generate book quantities within configured bounds', () => {
   const updates = generate(100);
 
   updates.forEach((update) => {
-    expect(update.bidQuantity).toBeGreaterThanOrEqual(0);
-    expect(update.askQuantity).toBeGreaterThanOrEqual(0);
-    expect(update.bidQuantity + update.askQuantity).toBe(update.tradeQuantity);
+    expect(update.bidQuantity).toBeGreaterThanOrEqual(DEFAULT_MIN_BOOK_QUANTITY);
+    expect(update.bidQuantity).toBeLessThanOrEqual(DEFAULT_MAX_BOOK_QUANTITY);
+    expect(update.askQuantity).toBeGreaterThanOrEqual(DEFAULT_MIN_BOOK_QUANTITY);
+    expect(update.askQuantity).toBeLessThanOrEqual(DEFAULT_MAX_BOOK_QUANTITY);
   });
+});
+
+test('Should generate book quantities independently from trade quantity', () => {
+  const updates = generate(100);
+
+  expect(
+    updates.some((update) => update.bidQuantity + update.askQuantity !== update.tradeQuantity),
+  ).toBe(true);
 });
 
 test('Should generate trade quantity within configured bounds', () => {

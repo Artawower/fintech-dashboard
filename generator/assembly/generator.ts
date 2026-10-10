@@ -47,8 +47,8 @@ export class Generator {
     const askCents = bidCents + spreadCents;
     const priceCents = choice([bidCents, askCents]);
     const tradeQuantity = randIntRange(this.config.minTradeQuantity, this.config.maxTradeQuantity);
-    const bidQuantity = randIntRange(0, tradeQuantity);
-    const askQuantity = tradeQuantity - bidQuantity;
+    const bidQuantity = randIntRange(this.config.minBookQuantity, this.config.maxBookQuantity);
+    const askQuantity = randIntRange(this.config.minBookQuantity, this.config.maxBookQuantity);
 
     const update: MarketUpdate = {
       instrument,
