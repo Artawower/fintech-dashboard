@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "test": "vitest run --config vitest.config.mts",
-    "test:update-snapshots": "vitest run --config vitest.config.mts --update",
+    "test:update-snapshots": "npm run asbuild:release && vitest run --config vitest.config.mts --update",
     "pretest": "npm run asbuild:release",
     "asbuild:debug": "asc assembly/index.ts --target debug",
     "asbuild:release": "asc assembly/index.ts --target release",
