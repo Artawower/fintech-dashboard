@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AppHeader } from './app-header.component';
 import { AppSidebar } from './components/app-sidebar.component';
@@ -8,4 +8,6 @@ import { AppSidebar } from './components/app-sidebar.component';
   selector: 'app-layout',
   templateUrl: './app-layout.component.html',
 })
-export class AppLayout {}
+export class AppLayout {
+  protected readonly navigationOpen = signal(false);
+}

@@ -43,6 +43,69 @@ describe('GeneratorSettings', () => {
     expect(error?.textContent).toContain(`must not exceed ${SETTINGS_LIMITS.instrumentCount.max}`);
   });
 
+  it('should reject non-integer (fractional) settings', () => {
+    const fixture = TestBed.createComponent(GeneratorSettings);
+    const controls = fixture.componentInstance.settingsForm.controls;
+
+    controls.instrumentCount.setValue(5.5);
+    controls.instrumentCount.markAsTouched();
+    controls.updatesPerBatch.setValue(10.2);
+    controls.updatesPerBatch.markAsTouched();
+    controls.updateIntervalMs.setValue(100.75);
+    controls.updateIntervalMs.markAsTouched();
+    fixture.detectChanges();
+
+    expect(controls.instrumentCount.hasError('integer')).toBe(true);
+    expect(controls.updatesPerBatch.hasError('integer')).toBe(true);
+    expect(controls.updateIntervalMs.hasError('integer')).toBe(true);
+    expect(fixture.componentInstance.settingsForm.invalid).toBe(true);
+
+    const element = fixture.nativeElement as HTMLElement; console.log(element.innerHTML);
+    expect(element.querySelector('#instrument-count-error')?.textContent).toContain(
+      'Instrument count must be an integer.',
+    );
+    expect(element.querySelector('#updates-per-batch-error')?.textContent).toContain(
+      'Updates per batch must be an integer.',
+    );
+    expect(element.querySelector('#update-interval-error')?.textContent).toContain(
+      'Batch interval must be an integer.',
+    );
+  });
+
+  it('should accept inclusive integer boundary values', () => {
+    const fixture = TestBed.createComponent(GeneratorSettings);
+    const controls = fixture.componentInstance.settingsForm.controls;
+
+    controls.instrumentCount.setValue(SETTINGS_LIMITS.instrumentCount.min);
+    controls.updatesPerBatch.setValue(SETTINGS_LIMITS.updatesPerBatch.min);
+    controls.updateIntervalMs.setValue(SETTINGS_LIMITS.updateIntervalMs.min);
+    expect(fixture.componentInstance.settingsForm.valid).toBe(true);
+
+    controls.instrumentCount.setValue(SETTINGS_LIMITS.instrumentCount.max);
+    controls.updatesPerBatch.setValue(SETTINGS_LIMITS.updatesPerBatch.max);
+    controls.updateIntervalMs.setValue(SETTINGS_LIMITS.updateIntervalMs.max);
+    expect(fixture.componentInstance.settingsForm.valid).toBe(true);
+  });
+
+  it('should associate all form inputs with accessible labels', () => {
+    const fixture = TestBed.createComponent(GeneratorSettings);
+    fixture.detectChanges();
+    const element = fixture.nativeElement as HTMLElement; console.log(element.innerHTML);
+
+    const fields = [
+      { inputId: '#instrument-count', labelId: '#instrument-count-label', labelText: 'Instrument count' },
+      { inputId: '#updates-per-batch', labelId: '#updates-per-batch-label', labelText: 'Updates per batch' },
+      { inputId: '#update-interval', labelId: '#update-interval-label', labelText: 'Batch interval' },
+    ];
+
+    for (const field of fields) {
+      const input = element.querySelector<HTMLInputElement>(field.inputId);
+      const label = element.querySelector<HTMLElement>(field.labelId);
+      expect(input?.getAttribute('aria-labelledby')).toBe(field.labelId.replace('#', ''));
+      expect(label?.textContent?.trim()).toBe(field.labelText);
+    }
+  });
+
   it('should log the current settings when they are applied', () => {
     const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
     const fixture = TestBed.createComponent(GeneratorSettings);
@@ -51,7 +114,7 @@ describe('GeneratorSettings', () => {
     fixture.componentInstance.settingsForm.controls.instrumentCount.setValue(8);
     expect(log).not.toHaveBeenCalled();
 
-    const element = fixture.nativeElement as HTMLElement;
+    const element = fixture.nativeElement as HTMLElement; console.log(element.innerHTML);
     const form = element.querySelector<HTMLFormElement>('form');
     form!.dispatchEvent(new Event('submit'));
 

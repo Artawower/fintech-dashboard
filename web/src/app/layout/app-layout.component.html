@@ -1,8 +1,20 @@
 <div class="drawer min-h-screen bg-base-200 lg:drawer-open" data-theme="light">
-  <input id="navigation-drawer" class="drawer-toggle" type="checkbox" />
+  <input
+    #navigationDrawer
+    id="navigation-drawer"
+    class="drawer-toggle"
+    type="checkbox"
+    tabindex="-1"
+    aria-hidden="true"
+    [checked]="navigationOpen()"
+    (change)="navigationOpen.set(navigationDrawer.checked)"
+  />
 
   <div class="drawer-content flex min-h-screen flex-col">
-    <app-header />
+    <app-header
+      [isNavigationOpen]="navigationOpen()"
+      (openNavigation)="navigationOpen.set(true)"
+    />
     <main class="flex-1 p-4 md:p-8">
       <div class="mx-auto max-w-7xl">
         <router-outlet />
@@ -10,5 +22,5 @@
     </main>
   </div>
 
-  <app-sidebar />
+  <app-sidebar (navigationSelected)="navigationOpen.set(false)" />
 </div>

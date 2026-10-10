@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { PROJECT_NAME } from '../core/constants';
 
 @Component({
@@ -6,5 +6,8 @@ import { PROJECT_NAME } from '../core/constants';
   templateUrl: './app-header.component.html',
 })
 export class AppHeader {
+  readonly isNavigationOpen = input.required<boolean>();
+  readonly openNavigation = output<void>();
+
   protected readonly projectName = PROJECT_NAME;
 }

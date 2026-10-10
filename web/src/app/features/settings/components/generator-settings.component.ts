@@ -1,11 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { NumberField } from '../../../shared/components/number-field.component';
+import { integerValidator } from '../../../shared/validators/integer.validator';
 import { DEFAULT_MARKET_SETTINGS } from '../../../core/constants';
 import { MarketSettings } from '../../../core/models/market-settings.model';
 import { SETTINGS_LIMITS } from '../settings.constants';
 
 @Component({
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, NumberField],
   selector: 'app-generator-settings',
   templateUrl: './generator-settings.component.html',
 })
@@ -19,6 +21,7 @@ export class GeneratorSettings {
       DEFAULT_MARKET_SETTINGS.instrumentCount,
       [
         Validators.required,
+        integerValidator,
         Validators.min(SETTINGS_LIMITS.instrumentCount.min),
         Validators.max(SETTINGS_LIMITS.instrumentCount.max),
       ],
@@ -27,6 +30,7 @@ export class GeneratorSettings {
       DEFAULT_MARKET_SETTINGS.updatesPerBatch,
       [
         Validators.required,
+        integerValidator,
         Validators.min(SETTINGS_LIMITS.updatesPerBatch.min),
         Validators.max(SETTINGS_LIMITS.updatesPerBatch.max),
       ],
@@ -35,6 +39,7 @@ export class GeneratorSettings {
       DEFAULT_MARKET_SETTINGS.updateIntervalMs,
       [
         Validators.required,
+        integerValidator,
         Validators.min(SETTINGS_LIMITS.updateIntervalMs.min),
         Validators.max(SETTINGS_LIMITS.updateIntervalMs.max),
       ],

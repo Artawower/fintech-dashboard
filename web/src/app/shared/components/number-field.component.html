@@ -1,0 +1,40 @@
+<fieldset class="fieldset">
+  <legend class="fieldset-legend" [id]="labelId()">{{ label() }}</legend>
+
+  <ng-template #inputElement>
+    <input
+      class="input w-full"
+      [class.join-item]="suffix()"
+      [id]="inputId()"
+      [name]="inputName()"
+      type="number"
+      [min]="min()"
+      [max]="max()"
+      [step]="step()"
+      [formControl]="control()"
+      [class.input-error]="isInvalid()"
+      [attr.aria-invalid]="isInvalid()"
+      [attr.aria-describedby]="describedBy()"
+      [attr.aria-labelledby]="labelId()"
+    />
+  </ng-template>
+
+  @if (suffix()) {
+    <div class="join w-full">
+      <ng-container *ngTemplateOutlet="inputElement" />
+      <span class="btn join-item" aria-hidden="true">{{ suffix() }}</span>
+    </div>
+  } @else {
+    <ng-container *ngTemplateOutlet="inputElement" />
+  }
+
+  <p class="label" [id]="helpId()">
+    Allowed range: {{ min() }}–{{ max() }} {{ rangeUnit() }}.
+  </p>
+
+  @if (isInvalid() && errorMessage()) {
+    <p class="label text-error" [id]="errorId()" role="alert">
+      {{ errorMessage() }}
+    </p>
+  }
+</fieldset>
