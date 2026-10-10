@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, expect, test, vi } from 'vitest';
+import { beforeEach, expect, test } from 'vitest';
 import { init as initWithSeed, generate, getInstruments } from '../build/release';
 import {
   DEFAULT_MAX_NEXT_SPREAD,
@@ -10,19 +10,12 @@ import {
 
 const seed = 27;
 const defaultInstrumentCount = 10;
-const fixedTimestamp = new Date('2025-01-01T00:00:00.000Z').getTime();
 const testBatchSizes = [0, 1, 5, 10, 20, 50, 100, 1000];
 
 const init = (instrumentCount: number) => initWithSeed(instrumentCount, seed);
 
 beforeEach(() => {
-  vi.useFakeTimers();
-  vi.setSystemTime(fixedTimestamp);
   init(defaultInstrumentCount);
-});
-
-afterEach(() => {
-  vi.useRealTimers();
 });
 
 test('Should generate required number of instruments', () => {
@@ -96,7 +89,6 @@ test('Should generate positive prices', () => {
   const updates = generate(100);
 
   updates.forEach((update) => {
-    expect(update.lastPriceCents).toBeGreaterThan(0);
     expect(update.bidCents).toBeGreaterThan(0);
     expect(update.askCents).toBeGreaterThan(0);
     expect(update.priceCents).toBeGreaterThan(0);
@@ -122,22 +114,16 @@ test('Should generate trade quantity within configured bounds', () => {
   });
 });
 
-test('Should limit bid price change to 15 percent', () => {
+test('Should limit bid price change to defaultMaxPercentDiff', () => {
+  init(1);
   const updates = generate(100);
 
-  updates.forEach((update) => {
-    const maxChange = Math.round((update.lastPriceCents * DEFAULT_MAX_PERCENT_DIFF) / 100);
-    const actualChange = Math.abs(update.bidCents - update.lastPriceCents);
+  updates.slice(1).forEach((update, index) => {
+    const previousPrice = updates[index].priceCents;
+    const maxChange = Math.round((previousPrice * DEFAULT_MAX_PERCENT_DIFF) / 100);
+    const actualChange = Math.abs(update.bidCents - previousPrice);
 
     expect(actualChange).toBeLessThanOrEqual(maxChange);
-  });
-});
-
-test('Should use fixed timestamp for generated updates', () => {
-  const updates = generate(100);
-
-  updates.forEach((update) => {
-    expect(update.time).toBe(BigInt(fixedTimestamp));
   });
 });
 
@@ -158,16 +144,19 @@ test('Should use previous trade price for next update of same instrument', () =>
   init(1);
   const [firstUpdate, secondUpdate] = generate(2);
 
+  const maxChange = Math.round((firstUpdate.priceCents * DEFAULT_MAX_PERCENT_DIFF) / 100);
+
   expect(secondUpdate.instrument).toBe(firstUpdate.instrument);
-  expect(secondUpdate.lastPriceCents).toBe(firstUpdate.priceCents);
+  expect(Math.abs(secondUpdate.bidCents - firstUpdate.priceCents)).toBeLessThanOrEqual(maxChange);
 });
 
 test('Should keep previous trade price between generated batches', () => {
   init(1);
   const [firstUpdate] = generate(1);
   const [secondUpdate] = generate(1);
+  const maxChange = Math.round((firstUpdate.priceCents * DEFAULT_MAX_PERCENT_DIFF) / 100);
 
-  expect(secondUpdate.lastPriceCents).toBe(firstUpdate.priceCents);
+  expect(Math.abs(secondUpdate.bidCents - firstUpdate.priceCents)).toBeLessThanOrEqual(maxChange);
 });
 
 test('Should keep separate price history for each instrument', () => {
@@ -181,7 +170,8 @@ test('Should keep separate price history for each instrument', () => {
 
     if (previousPrice !== undefined) {
       repeatedUpdates += 1;
-      expect(update.lastPriceCents).toBe(previousPrice);
+      const maxChange = Math.round((previousPrice * DEFAULT_MAX_PERCENT_DIFF) / 100);
+      expect(Math.abs(update.bidCents - previousPrice)).toBeLessThanOrEqual(maxChange);
     }
 
     previousPrices[update.instrument] = update.priceCents;

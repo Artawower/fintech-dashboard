@@ -52,8 +52,6 @@ export class Generator {
 
     const update: MarketUpdate = {
       instrument,
-      lastPriceCents,
-      time: Date.now(),
       priceCents,
       tradeQuantity,
       bidCents,
@@ -75,9 +73,7 @@ export class Generator {
       return randIntRange(this.config.minInstrumentCentPrice, this.config.maxInstrumentCentPrice);
     }
 
-    const previousRecord = this.history.get(instrument);
-
-    return previousRecord.priceCents;
+    return this.history.get(instrument).priceCents;
   }
 
   private generateNextBid(price: i32): i32 {

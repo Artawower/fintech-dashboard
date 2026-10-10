@@ -8,9 +8,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 31106,
     "bidQuantity": 199,
     "instrument": "DIVK",
-    "lastPriceCents": 35348,
     "priceCents": 31106,
-    "time": 1735689600000n,
     "tradeQuantity": 3348,
   },
   {
@@ -19,9 +17,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 172498,
     "bidQuantity": 1975,
     "instrument": "SFUA",
-    "lastPriceCents": 200579,
     "priceCents": 172498,
-    "time": 1735689600000n,
     "tradeQuantity": 4145,
   },
   {
@@ -30,9 +26,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 369156,
     "bidQuantity": 1341,
     "instrument": "NRHG",
-    "lastPriceCents": 384537,
     "priceCents": 369156,
-    "time": 1735689600000n,
     "tradeQuantity": 2765,
   },
   {
@@ -41,9 +35,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 420838,
     "bidQuantity": 1521,
     "instrument": "NRHG",
-    "lastPriceCents": 369156,
     "priceCents": 420838,
-    "time": 1735689600000n,
     "tradeQuantity": 1567,
   },
   {
@@ -52,9 +44,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 145352,
     "bidQuantity": 377,
     "instrument": "XUVX",
-    "lastPriceCents": 143913,
     "priceCents": 145352,
-    "time": 1735689600000n,
     "tradeQuantity": 3941,
   },
   {
@@ -63,9 +53,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 467130,
     "bidQuantity": 172,
     "instrument": "NRHG",
-    "lastPriceCents": 420838,
     "priceCents": 467138,
-    "time": 1735689600000n,
     "tradeQuantity": 2501,
   },
   {
@@ -74,9 +62,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 177753,
     "bidQuantity": 363,
     "instrument": "QACP",
-    "lastPriceCents": 209121,
     "priceCents": 177755,
-    "time": 1735689600000n,
     "tradeQuantity": 642,
   },
   {
@@ -85,9 +71,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 481152,
     "bidQuantity": 1491,
     "instrument": "NRHG",
-    "lastPriceCents": 467138,
     "priceCents": 481152,
-    "time": 1735689600000n,
     "tradeQuantity": 3279,
   },
   {
@@ -96,9 +80,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 476340,
     "bidQuantity": 701,
     "instrument": "NRHG",
-    "lastPriceCents": 481152,
     "priceCents": 476351,
-    "time": 1735689600000n,
     "tradeQuantity": 3822,
   },
   {
@@ -107,9 +89,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 186298,
     "bidQuantity": 786,
     "instrument": "SFUA",
-    "lastPriceCents": 172498,
     "priceCents": 186298,
-    "time": 1735689600000n,
     "tradeQuantity": 2570,
   },
   {
@@ -118,9 +98,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 443006,
     "bidQuantity": 1847,
     "instrument": "NRHG",
-    "lastPriceCents": 476351,
     "priceCents": 443006,
-    "time": 1735689600000n,
     "tradeQuantity": 4634,
   },
   {
@@ -129,9 +107,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 411996,
     "bidQuantity": 385,
     "instrument": "NRHG",
-    "lastPriceCents": 443006,
     "priceCents": 411996,
-    "time": 1735689600000n,
     "tradeQuantity": 2887,
   },
   {
@@ -140,9 +116,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 453196,
     "bidQuantity": 3368,
     "instrument": "NRHG",
-    "lastPriceCents": 411996,
     "priceCents": 453208,
-    "time": 1735689600000n,
     "tradeQuantity": 4328,
   },
   {
@@ -151,9 +125,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 240600,
     "bidQuantity": 828,
     "instrument": "AEMY",
-    "lastPriceCents": 264396,
     "priceCents": 240612,
-    "time": 1735689600000n,
     "tradeQuantity": 2196,
   },
   {
@@ -162,9 +134,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 35461,
     "bidQuantity": 1265,
     "instrument": "DIVK",
-    "lastPriceCents": 31106,
     "priceCents": 35463,
-    "time": 1735689600000n,
     "tradeQuantity": 1992,
   },
   {
@@ -173,9 +143,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 183088,
     "bidQuantity": 286,
     "instrument": "QACP",
-    "lastPriceCents": 177755,
     "priceCents": 183097,
-    "time": 1735689600000n,
     "tradeQuantity": 4911,
   },
   {
@@ -184,9 +152,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 137595,
     "bidQuantity": 2075,
     "instrument": "GRRG",
-    "lastPriceCents": 146378,
     "priceCents": 137595,
-    "time": 1735689600000n,
     "tradeQuantity": 3565,
   },
   {
@@ -195,9 +161,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 65662,
     "bidQuantity": 154,
     "instrument": "OXWH",
-    "lastPriceCents": 72156,
     "priceCents": 65662,
-    "time": 1735689600000n,
     "tradeQuantity": 467,
   },
   {
@@ -206,9 +170,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 268653,
     "bidQuantity": 802,
     "instrument": "KCYW",
-    "lastPriceCents": 276962,
     "priceCents": 268653,
-    "time": 1735689600000n,
     "tradeQuantity": 2078,
   },
   {
@@ -217,9 +179,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 521189,
     "bidQuantity": 2321,
     "instrument": "NRHG",
-    "lastPriceCents": 453208,
     "priceCents": 521189,
-    "time": 1735689600000n,
     "tradeQuantity": 4502,
   },
   {
@@ -228,9 +188,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 140991,
     "bidQuantity": 9,
     "instrument": "XUVX",
-    "lastPriceCents": 145352,
     "priceCents": 140995,
-    "time": 1735689600000n,
     "tradeQuantity": 363,
   },
   {
@@ -239,9 +197,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 158234,
     "bidQuantity": 2002,
     "instrument": "GRRG",
-    "lastPriceCents": 137595,
     "priceCents": 158234,
-    "time": 1735689600000n,
     "tradeQuantity": 3372,
   },
   {
@@ -250,9 +206,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 568096,
     "bidQuantity": 989,
     "instrument": "NRHG",
-    "lastPriceCents": 521189,
     "priceCents": 568097,
-    "time": 1735689600000n,
     "tradeQuantity": 1674,
   },
   {
@@ -261,9 +215,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 170280,
     "bidQuantity": 106,
     "instrument": "QACP",
-    "lastPriceCents": 183097,
     "priceCents": 170288,
-    "time": 1735689600000n,
     "tradeQuantity": 117,
   },
   {
@@ -272,9 +224,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 32981,
     "bidQuantity": 858,
     "instrument": "DIVK",
-    "lastPriceCents": 35463,
     "priceCents": 32981,
-    "time": 1735689600000n,
     "tradeQuantity": 4714,
   },
   {
@@ -283,9 +233,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 273087,
     "bidQuantity": 761,
     "instrument": "IXPF",
-    "lastPriceCents": 296834,
     "priceCents": 273087,
-    "time": 1735689600000n,
     "tradeQuantity": 2001,
   },
   {
@@ -294,9 +242,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 68288,
     "bidQuantity": 3996,
     "instrument": "OXWH",
-    "lastPriceCents": 65662,
     "priceCents": 68288,
-    "time": 1735689600000n,
     "tradeQuantity": 4897,
   },
   {
@@ -305,9 +251,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 276704,
     "bidQuantity": 194,
     "instrument": "AEMY",
-    "lastPriceCents": 240612,
     "priceCents": 276704,
-    "time": 1735689600000n,
     "tradeQuantity": 1193,
   },
   {
@@ -316,9 +260,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 252534,
     "bidQuantity": 105,
     "instrument": "KCYW",
-    "lastPriceCents": 268653,
     "priceCents": 252534,
-    "time": 1735689600000n,
     "tradeQuantity": 142,
   },
   {
@@ -327,9 +269,7 @@ exports[`Generated updates should match the previous snapshot 1`] = `
     "bidCents": 177100,
     "bidQuantity": 1626,
     "instrument": "QACP",
-    "lastPriceCents": 170288,
     "priceCents": 177100,
-    "time": 1735689600000n,
     "tradeQuantity": 2016,
   },
 ]
