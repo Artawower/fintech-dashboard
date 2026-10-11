@@ -1,4 +1,4 @@
-import { MarketSettings } from '../../core/models/market-settings.model';
+import { MarketSettings } from '@app/core/models/market-settings.model';
 
 type SettingLimits = Record<keyof MarketSettings, Readonly<{ min: number; max: number }>>;
 

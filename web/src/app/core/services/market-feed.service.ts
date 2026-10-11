@@ -1,9 +1,9 @@
 import { DestroyRef, inject, Service, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import type { MarketFeedStatus } from '../models/market-feed.model';
-import type { InstrumentStatistics } from '../models/instrument-statistics.model';
-import type { MarketSettings } from '../models/market-settings.model';
-import type { WorkerOutboundMessage } from '../worker/market-worker.protocol';
+import type { MarketFeedStatus } from '@app/core/models/market-feed.model';
+import type { InstrumentStatistics } from '@app/core/models/instrument-statistics.model';
+import type { MarketSettings } from '@app/core/models/market-settings.model';
+import type { WorkerOutboundMessage } from '@app/core/worker/market-worker.protocol';
 import { SettingsService } from './settings.service';
 
 @Service()

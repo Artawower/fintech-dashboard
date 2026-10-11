@@ -1,4 +1,4 @@
-type WasmGeneratorModule = typeof import('../../../../../generator/build/release.js');
+type WasmGeneratorModule = typeof import('@generator/build/release.js');
 
 export type WasmMarketGenerator = Pick<
   WasmGeneratorModule,

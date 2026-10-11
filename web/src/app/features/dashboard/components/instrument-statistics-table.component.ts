@@ -1,6 +1,6 @@
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { Component, input } from '@angular/core';
-import type { InstrumentStatistics } from '../../../core/models/instrument-statistics.model';
+import type { InstrumentStatistics } from '@app/core/models/instrument-statistics.model';
 
 @Component({
   imports: [CurrencyPipe, DecimalPipe],

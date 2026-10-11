@@ -1,5 +1,5 @@
-import type { InstrumentStatistics } from '../models/instrument-statistics.model';
-import type { MarketUpdate } from '../models/market-update.model';
+import type { InstrumentStatistics } from '@app/core/models/instrument-statistics.model';
+import type { MarketUpdate } from '@app/core/models/market-update.model';
 
 export class InstrumentMismatchError extends Error {
   public constructor(updateInstrument: string, statisticsInstrument: string) {

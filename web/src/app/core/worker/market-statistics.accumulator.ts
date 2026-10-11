@@ -1,6 +1,6 @@
-import type { InstrumentStatistics } from '../models/instrument-statistics.model';
-import type { MarketUpdate } from '../models/market-update.model';
-import { createInstrumentStatistics, updateInstrumentStatistics } from '../domain/market-statistic';
+import type { InstrumentStatistics } from '@app/core/models/instrument-statistics.model';
+import type { MarketUpdate } from '@app/core/models/market-update.model';
+import { createInstrumentStatistics, updateInstrumentStatistics } from '@app/core/domain/market-statistic';
 
 export class MarketStatisticsAccumulator {
   private readonly statistics = new Map<string, InstrumentStatistics>();

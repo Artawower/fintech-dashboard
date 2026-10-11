@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { MarketFeedService } from '../../core/services/market-feed.service';
+import { MarketFeedService } from '@app/core/services/market-feed.service';
 import { InstrumentStatisticsTable } from './components/instrument-statistics-table.component';
 
 @Component({

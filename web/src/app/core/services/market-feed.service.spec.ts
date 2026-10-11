@@ -1,9 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { DEFAULT_MARKET_SETTINGS } from '../constants';
-import type { MarketSettings } from '../models/market-settings.model';
-import type { InstrumentStatistics } from '../models/instrument-statistics.model';
-import { MockMarketWorker } from '../../../../test-utils/mock-market-worker';
+import { DEFAULT_MARKET_SETTINGS } from '@app/core/constants';
+import type { MarketSettings } from '@app/core/models/market-settings.model';
+import type { InstrumentStatistics } from '@app/core/models/instrument-statistics.model';
+import { MockMarketWorker } from '@test-utils/mock-market-worker';
 import { MarketFeedService } from './market-feed.service';
 import { SettingsService } from './settings.service';
 

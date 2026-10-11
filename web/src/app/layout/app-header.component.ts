@@ -1,5 +1,5 @@
 import { Component, input, output } from '@angular/core';
-import { PROJECT_NAME } from '../core/constants';
+import { PROJECT_NAME } from '@app/core/constants';
 
 @Component({
   selector: 'app-header',

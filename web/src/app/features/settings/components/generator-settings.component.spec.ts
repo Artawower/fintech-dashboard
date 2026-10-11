@@ -1,9 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { vi } from 'vitest';
-import { DEFAULT_MARKET_SETTINGS } from '../../../core/constants';
-import { SettingsService } from '../../../core/services/settings.service';
-import { SETTINGS_LIMITS } from '../settings.constants';
+import { DEFAULT_MARKET_SETTINGS } from '@app/core/constants';
+import { SettingsService } from '@app/core/services/settings.service';
+import { SETTINGS_LIMITS } from '@app/features/settings/settings.constants';
 import { GeneratorSettings } from './generator-settings.component';
 
 describe('GeneratorSettings', () => {

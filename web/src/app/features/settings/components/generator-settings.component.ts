@@ -1,11 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { NumberField } from '../../../shared/components/number-field.component';
-import { integerValidator } from '../../../shared/validators/integer.validator';
-import { SettingsService } from '../../../core/services/settings.service';
-import { MarketSettings } from '../../../core/models/market-settings.model';
-import { SETTINGS_LIMITS } from '../settings.constants';
+import { NumberField } from '@app/shared/components/number-field.component';
+import { integerValidator } from '@app/shared/validators/integer.validator';
+import { SettingsService } from '@app/core/services/settings.service';
+import { MarketSettings } from '@app/core/models/market-settings.model';
+import { SETTINGS_LIMITS } from '@app/features/settings/settings.constants';
 
 @Component({
   imports: [ReactiveFormsModule, NumberField],

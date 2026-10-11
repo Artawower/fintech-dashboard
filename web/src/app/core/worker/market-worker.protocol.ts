@@ -1,5 +1,5 @@
-import type { InstrumentStatistics } from '../models/instrument-statistics.model';
-import type { MarketSettings } from '../models/market-settings.model';
+import type { InstrumentStatistics } from '@app/core/models/instrument-statistics.model';
+import type { MarketSettings } from '@app/core/models/market-settings.model';
 
 export type WorkerInboundMessage =
   | { type: 'INIT'; runId: number; settings: MarketSettings }

@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 
-import type { MarketSettings } from '../models/market-settings.model';
+import type { MarketSettings } from '@app/core/models/market-settings.model';
 import type { WorkerInboundMessage, WorkerOutboundMessage } from './market-worker.protocol';
 import { loadWasmGenerator } from './wasm-generator.loader';
 import type { WasmMarketGenerator } from './wasm-generator.loader';

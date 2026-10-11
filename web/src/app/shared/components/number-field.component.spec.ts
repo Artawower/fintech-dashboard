@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { integerValidator } from '../validators/integer.validator';
+import { integerValidator } from '@app/shared/validators/integer.validator';
 import { NumberField } from './number-field.component';
 
 @Component({

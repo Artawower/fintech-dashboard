@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { afterEach, beforeEach, vi } from 'vitest';
 import { App } from './app';
 import { appConfig } from './app.config';
-import { MockMarketWorker } from '../../test-utils/mock-market-worker';
+import { MockMarketWorker } from '@test-utils/mock-market-worker';
 
 afterEach(() => {
   TestBed.resetTestingModule();

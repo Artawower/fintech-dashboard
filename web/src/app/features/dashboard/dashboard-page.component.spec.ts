@@ -2,9 +2,9 @@ import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { ComponentFixture } from '@angular/core/testing';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { MarketFeedStatus } from '../../core/models/market-feed.model';
-import type { InstrumentStatistics } from '../../core/models/instrument-statistics.model';
-import { MarketFeedService } from '../../core/services/market-feed.service';
+import { MarketFeedStatus } from '@app/core/models/market-feed.model';
+import type { InstrumentStatistics } from '@app/core/models/instrument-statistics.model';
+import { MarketFeedService } from '@app/core/services/market-feed.service';
 import { DashboardPage } from './dashboard-page.component';
 
 describe('DashboardPage', () => {

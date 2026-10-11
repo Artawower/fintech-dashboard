@@ -1,8 +1,8 @@
 import { Service } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { BehaviorSubject } from 'rxjs';
-import { DEFAULT_MARKET_SETTINGS } from '../constants';
-import { MarketSettings } from '../models/market-settings.model';
+import { DEFAULT_MARKET_SETTINGS } from '@app/core/constants';
+import { MarketSettings } from '@app/core/models/market-settings.model';
 
 @Service()
 export class SettingsService {
