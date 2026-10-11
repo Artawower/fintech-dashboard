@@ -1,3 +1,15 @@
+import type { InstrumentStatistics } from '../models/instrument-statistics.model';
+import type { MarketUpdate } from '../models/market-update.model';
+
+export class InstrumentMismatchError extends Error {
+  public constructor(updateInstrument: string, statisticsInstrument: string) {
+    super(
+      `Cannot apply an update for instrument "${updateInstrument}" to statistics for "${statisticsInstrument}".`,
+    );
+    this.name = 'InstrumentMismatchError';
+  }
+}
+
 export class InvalidPriceRange extends Error {
   public constructor(bidPrice: number, askPrice: number) {
     super(`Invalid price range: ask price ${askPrice} must be greater than bid price ${bidPrice}.`);
@@ -82,4 +94,44 @@ export function calculateOrderBookImbalance(
   }
 
   return (bidQuantity - askQuantity) / totalQuantity;
+}
+
+export function createInstrumentStatistics(instrument: string): InstrumentStatistics {
+  return {
+    instrument,
+    lastPriceCents: null,
+    spreadCents: null,
+    tradingVolume: 0,
+    totalTradeValue: 0,
+    vwapCents: null,
+    orderBookImbalance: null,
+  };
+}
+
+export function updateInstrumentStatistics(
+  current: InstrumentStatistics,
+  update: MarketUpdate,
+): InstrumentStatistics {
+  if (current.instrument !== update.instrument) {
+    throw new InstrumentMismatchError(update.instrument, current.instrument);
+  }
+
+  assertIntegers(current.totalTradeValue, update.priceCents);
+  assertNonNegative(current.totalTradeValue);
+  assertPositive(update.priceCents);
+  const spreadCents = calculateBidAskSpread(update.bidCents, update.askCents);
+  const tradingVolume = sumTradingVolume(current.tradingVolume, update.tradeQuantity);
+  const totalTradeValue = current.totalTradeValue + update.priceCents * update.tradeQuantity;
+  assertIntegers(totalTradeValue);
+  assertNonNegative(totalTradeValue);
+
+  return {
+    instrument: update.instrument,
+    lastPriceCents: update.priceCents,
+    spreadCents,
+    tradingVolume,
+    totalTradeValue,
+    vwapCents: calculateVWAP(totalTradeValue, tradingVolume),
+    orderBookImbalance: calculateOrderBookImbalance(update.bidQuantity, update.askQuantity),
+  };
 }
