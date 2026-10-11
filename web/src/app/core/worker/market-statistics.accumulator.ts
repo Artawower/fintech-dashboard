@@ -11,7 +11,8 @@ export class MarketStatisticsAccumulator {
 
   public processBatch(updates: readonly MarketUpdate[]): InstrumentStatistics[] {
     updates.forEach((update) => {
-      const current = this.statistics.get(update.instrument) ?? createInstrumentStatistics(update.instrument);
+      const current =
+        this.statistics.get(update.instrument) ?? createInstrumentStatistics(update.instrument);
       this.statistics.set(update.instrument, updateInstrumentStatistics(current, update));
     });
 
