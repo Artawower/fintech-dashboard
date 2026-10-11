@@ -4,9 +4,11 @@ import type { MarketSettings } from '../models/market-settings.model';
 import type { WorkerInboundMessage, WorkerOutboundMessage } from './market-worker.protocol';
 import { loadWasmGenerator } from './wasm-generator.loader';
 import type { WasmMarketGenerator } from './wasm-generator.loader';
+import { MarketStatisticsAccumulator } from './market-statistics.accumulator';
 
 let activeRunId = 0;
 let generator: WasmMarketGenerator | null = null;
+let statistics: MarketStatisticsAccumulator | null = null;
 let timer: ReturnType<typeof setInterval> | null = null;
 let paused = false;
 let settings: MarketSettings | null = null;
@@ -30,11 +32,11 @@ function reportError(runId: number, error: unknown): void {
 }
 
 function generateBatch(runId: number): void {
-  if (runId !== activeRunId || !generator || !settings) return;
+  if (runId !== activeRunId || !generator || !statistics || !settings) return;
 
   try {
     const updates = generator.generate(settings.updatesPerBatch);
-    post({ type: 'BATCH', runId, updates });
+    post({ type: 'STATISTICS', runId, statistics: statistics.processBatch(updates) });
   } catch (error) {
     stop();
     reportError(runId, error);
@@ -43,7 +45,7 @@ function generateBatch(runId: number): void {
 
 function start(): void {
   stop();
-  if (paused || !generator || !settings) return;
+  if (paused || !generator || !statistics || !settings) return;
 
   const runId = activeRunId;
   timer = setInterval(() => generateBatch(runId), settings.updateIntervalMs);
@@ -55,15 +57,22 @@ async function initialize(message: Extract<WorkerInboundMessage, { type: 'INIT' 
   activeRunId = message.runId;
   paused = false;
   generator = null;
+  statistics = null;
   settings = message.settings;
   stop();
 
   try {
-    const nextGenerator = await loadWasmGenerator(message.wasmUrl);
+    const nextGenerator = await loadWasmGenerator();
     if (activeRunId !== message.runId) return;
 
     nextGenerator.init(message.settings.instrumentCount, Math.floor(Math.random() * 1_000_000));
     generator = nextGenerator;
+    statistics = new MarketStatisticsAccumulator(nextGenerator.getInstruments());
+    post({
+      type: 'STATISTICS',
+      runId: message.runId,
+      statistics: statistics.processBatch([]),
+    });
     start();
   } catch (error) {
     if (activeRunId === message.runId) reportError(message.runId, error);

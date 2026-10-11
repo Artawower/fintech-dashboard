@@ -1,8 +1,8 @@
 import { DestroyRef, inject, Service, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import type { MarketFeedStatus } from '../models/market-feed.model';
+import type { InstrumentStatistics } from '../models/instrument-statistics.model';
 import type { MarketSettings } from '../models/market-settings.model';
-import type { MarketUpdate } from '../models/market-update.model';
 import type { WorkerOutboundMessage } from '../worker/market-worker.protocol';
 import { SettingsService } from './settings.service';
 
@@ -14,7 +14,7 @@ export class MarketFeedService {
   private currentRunId = 0;
 
   public readonly status = signal<MarketFeedStatus>('idle');
-  public readonly latestBatch = signal<MarketUpdate[]>([]);
+  public readonly statistics = signal<InstrumentStatistics[]>([]);
   public readonly error = signal<string | null>(null);
 
   public constructor() {
@@ -62,25 +62,23 @@ export class MarketFeedService {
   private startRun(settings: MarketSettings): void {
     const runId = ++this.currentRunId;
     this.status.set('running');
-    this.latestBatch.set([]);
+    this.statistics.set([]);
     this.error.set(null);
     this.worker?.postMessage({
       type: 'INIT',
       runId,
       settings,
-      wasmUrl: new URL('wasm/release.wasm', document.baseURI).href,
     });
   }
 
   private handleMessage(message: WorkerOutboundMessage): void {
-    console.log('✎: [line 76][market-feed.service.ts] message:: ', message);
     if (message.runId !== this.currentRunId) return;
     if (message.type === 'ERROR') {
       this.fail(message.error);
       return;
     }
 
-    this.latestBatch.set(message.updates);
+    this.statistics.set(message.statistics);
   }
 
   private fail(error: string): void {

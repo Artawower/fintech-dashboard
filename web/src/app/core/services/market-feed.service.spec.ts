@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_MARKET_SETTINGS } from '../constants';
 import type { MarketSettings } from '../models/market-settings.model';
-import type { MarketUpdate } from '../models/market-update.model';
+import type { InstrumentStatistics } from '../models/instrument-statistics.model';
 import { MockMarketWorker } from '../../../../test-utils/mock-market-worker';
 import { MarketFeedService } from './market-feed.service';
 import { SettingsService } from './settings.service';
@@ -13,6 +13,18 @@ afterEach(() => {
 });
 
 describe('MarketFeedService', () => {
+  function sampleStatistics(): InstrumentStatistics[] {
+    return [{
+      instrument: 'AAPL',
+      lastPriceCents: 100,
+      spreadCents: 2,
+      tradingVolume: 2,
+      totalTradeValue: 200,
+      vwapCents: 100,
+      orderBookImbalance: 0,
+    }];
+  }
+
   function setup() {
     MockMarketWorker.instances = [];
     vi.stubGlobal('Worker', MockMarketWorker);
@@ -27,48 +39,31 @@ describe('MarketFeedService', () => {
 
   it('starts a run with the default settings', () => {
     const { worker, service } = setup();
-    expect(worker.posted[0]).toMatchObject({ type: 'INIT', runId: 1, settings: DEFAULT_MARKET_SETTINGS });
+    expect(worker.posted[0]).toEqual({ type: 'INIT', runId: 1, settings: DEFAULT_MARKET_SETTINGS });
     expect(service.status()).toBe('running');
   });
 
-  it('restarts and clears the latest batch when settings change', () => {
+  it('restarts and clears statistics when settings change', () => {
     const { worker, service, settings } = setup();
-    const updates: MarketUpdate[] = [{
-      instrument: 'AAPL',
-      priceCents: 100,
-      tradeQuantity: 2,
-      bidCents: 99,
-      askCents: 101,
-      bidQuantity: 5,
-      askQuantity: 4,
-    }];
-    worker.emit({ type: 'BATCH', runId: 1, updates });
+    worker.emit({ type: 'STATISTICS', runId: 1, statistics: sampleStatistics() });
 
     const nextSettings: MarketSettings = { instrumentCount: 8, updatesPerBatch: 50, updateIntervalMs: 100 };
     settings.updateSettings(nextSettings);
 
     expect(worker.posted.at(-1)).toMatchObject({ type: 'INIT', runId: 2, settings: nextSettings });
-    expect(service.latestBatch()).toEqual([]);
+    expect(service.statistics()).toEqual([]);
   });
 
-  it('ignores batches from superseded runs', () => {
+  it('ignores statistics from superseded runs', () => {
     const { worker, service, settings } = setup();
     settings.updateSettings({ instrumentCount: 8, updatesPerBatch: 50, updateIntervalMs: 100 });
 
-    const updates: MarketUpdate[] = [{
-      instrument: 'AAPL',
-      priceCents: 100,
-      tradeQuantity: 2,
-      bidCents: 99,
-      askCents: 101,
-      bidQuantity: 5,
-      askQuantity: 4,
-    }];
-    worker.emit({ type: 'BATCH', runId: 1, updates });
-    expect(service.latestBatch()).toEqual([]);
+    const statistics = sampleStatistics();
+    worker.emit({ type: 'STATISTICS', runId: 1, statistics });
+    expect(service.statistics()).toEqual([]);
 
-    worker.emit({ type: 'BATCH', runId: 2, updates });
-    expect(service.latestBatch()).toEqual(updates);
+    worker.emit({ type: 'STATISTICS', runId: 2, statistics });
+    expect(service.statistics()).toEqual(statistics);
   });
 
   it('pauses and resumes the current run', () => {

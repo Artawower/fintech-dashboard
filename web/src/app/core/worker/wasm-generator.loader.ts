@@ -5,7 +5,7 @@ export type WasmMarketGenerator = Pick<
   'init' | 'generate' | 'getInstruments'
 >;
 
-export async function loadWasmGenerator(wasmUrl: string): Promise<WasmMarketGenerator> {
-  const moduleUrl = new URL('release.js', wasmUrl).href;
+export async function loadWasmGenerator(): Promise<WasmMarketGenerator> {
+  const moduleUrl = new URL('wasm/release.js', self.location.href).href;
   return (await import(moduleUrl)) as WasmMarketGenerator;
 }
