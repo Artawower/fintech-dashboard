@@ -1,6 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "strict": true,
     "paths": {
       "@app/*": ["./src/app/*"],
       "@test-utils/*": ["./test-utils/*"],
@@ -18,6 +19,7 @@
     "module": "preserve"
   },
   "angularCompilerOptions": {
+    "strictTemplates": true,
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true
