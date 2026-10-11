@@ -2,8 +2,9 @@
 
 ## Links
 
-- [Specification](./docs/spec.md)
-- [Github Page](https://artawower.github.io/fintech-dashboard/)
+- Repository: [GitHub](https://github.com/Artawower/fintech-dashboard)
+- Live demo: [GitHub Pages](https://artawower.github.io/fintech-dashboard/)
+- Assignment: [Specification](./docs/spec.md)
 
 ## Installation
 
@@ -15,11 +16,37 @@ cd fintech-dashboard
 npm ci
 ```
 
-## Run
+## Run locally
+
+```bash
+npm run web:dev
+```
+
+This builds the WebAssembly generator and starts the Angular development server. Open the local URL printed in the terminal.
+
+## Build
+
+```bash
+npm run web:build
+```
+
+To build with the GitHub Pages base path:
+
+```bash
+npm run web:build:pages
+```
+
+## Tests and lint
+
+```bash
+npm run web:test
+npm run wasm:test
+npm run web:lint
+```
 
 ## Technologies
 
-1. Client: Angular 22
-2. WebAssembly module: AssemblyScript
-3. AI-assisted development: Pi coding agent; Codex Astra for quality checks
-4. Tests: Vitest
+- Client: Angular 22
+- WebAssembly module: AssemblyScript
+- Tests: Vitest
+- AI-assisted development: Pi coding agent; Codex Astra for quality checks
