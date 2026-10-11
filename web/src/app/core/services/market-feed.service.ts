@@ -5,6 +5,7 @@ import type { InstrumentStatistics } from '@app/core/models/instrument-statistic
 import type { MarketSettings } from '@app/core/models/market-settings.model';
 import type { WorkerOutboundMessage } from '@app/core/worker/market-worker.protocol';
 import { SettingsService } from './settings.service';
+import { BehaviorSubject } from 'rxjs';
 
 @Service()
 export class MarketFeedService {
@@ -13,9 +14,11 @@ export class MarketFeedService {
   private worker: Worker | null = null;
   private currentRunId = 0;
 
+  private readonly _statistics$ = new BehaviorSubject<InstrumentStatistics[]>([]);
+
   public readonly status = signal<MarketFeedStatus>('idle');
-  public readonly statistics = signal<InstrumentStatistics[]>([]);
   public readonly error = signal<string | null>(null);
+  public readonly statistics$ = this._statistics$.asObservable();
 
   public constructor() {
     const worker = this.createWorker();
@@ -62,7 +65,7 @@ export class MarketFeedService {
   private startRun(settings: MarketSettings): void {
     const runId = ++this.currentRunId;
     this.status.set('running');
-    this.statistics.set([]);
+    this._statistics$.next([]);
     this.error.set(null);
     this.worker?.postMessage({
       type: 'INIT',
@@ -78,7 +81,7 @@ export class MarketFeedService {
       return;
     }
 
-    this.statistics.set(message.statistics);
+    this._statistics$.next(message.statistics);
   }
 
   private fail(error: string): void {

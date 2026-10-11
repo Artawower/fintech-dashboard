@@ -19,7 +19,9 @@
           class="btn"
           [class.btn-outline]="marketFeed.status() === 'running'"
           [class.btn-primary]="marketFeed.status() === 'paused'"
-          [attr.aria-label]="marketFeed.status() === 'running' ? 'Pause market feed' : 'Resume market feed'"
+          [attr.aria-label]="
+            marketFeed.status() === 'running' ? 'Pause market feed' : 'Resume market feed'
+          "
           (click)="togglePause()"
         >
           {{ marketFeed.status() === 'running' ? 'Pause' : 'Resume' }}
@@ -34,8 +36,5 @@
     </div>
   }
 
-  <app-instrument-statistics-table
-    [statistics]="marketFeed.statistics()"
-    [error]="marketFeed.error()"
-  />
+  <app-instrument-statistics-table [statistics]="statistics()" [error]="marketFeed.error()" />
 </main>

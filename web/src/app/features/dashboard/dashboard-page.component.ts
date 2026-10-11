@@ -1,6 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { MarketFeedService } from '@app/core/services/market-feed.service';
 import { InstrumentStatisticsTable } from './components/instrument-statistics-table.component';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { animationFrameScheduler, throttleTime } from 'rxjs';
 
 @Component({
   imports: [InstrumentStatisticsTable],
@@ -9,6 +11,16 @@ import { InstrumentStatisticsTable } from './components/instrument-statistics-ta
 })
 export class DashboardPage {
   public readonly marketFeed = inject(MarketFeedService);
+
+  public readonly statistics = toSignal(
+    this.marketFeed.statistics$.pipe(
+      throttleTime(0, animationFrameScheduler, {
+        trailing: true,
+        leading: true,
+      }),
+    ),
+    { initialValue: [] },
+  );
 
   public togglePause(): void {
     if (this.marketFeed.status() === 'running') {
