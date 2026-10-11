@@ -1,5 +1,6 @@
 import {
   calculateBidAskSpread,
+  calculateOrderBookImbalance,
   calculateVWAP,
   InvalidPriceRange,
   sumTradingVolume,
@@ -115,5 +116,50 @@ describe('VWAP calculation', () => {
     ].forEach(([totalTradeValue, totalTradeQuantity]) => {
       expect(() => calculateVWAP(totalTradeValue, totalTradeQuantity)).toThrow(RangeError);
     });
+  });
+});
+
+describe('Order book imbalance calculation', () => {
+  test('Should calculate imbalance from the latest bid and ask quantities', () => {
+    expect(calculateOrderBookImbalance(600, 400)).toBeCloseTo(0.2);
+  });
+
+  test('Should return a negative imbalance when ask quantity is larger', () => {
+    expect(calculateOrderBookImbalance(400, 600)).toBeCloseTo(-0.2);
+  });
+
+  test('Should return zero when bid and ask quantities are equal', () => {
+    expect(calculateOrderBookImbalance(400, 400)).toBe(0);
+  });
+
+  test('Should return the imbalance bounds for a one-sided book', () => {
+    expect(calculateOrderBookImbalance(600, 0)).toBe(1);
+    expect(calculateOrderBookImbalance(0, 400)).toBe(-1);
+  });
+
+  test('Should return unavailable when both book quantities are zero', () => {
+    expect(calculateOrderBookImbalance(0, 0)).toBeNull();
+  });
+
+  test('Should reject negative quantities', () => {
+    [[-1, 10], [10, -1], [-1, -1]].forEach(([bidQuantity, askQuantity]) => {
+      expect(() => calculateOrderBookImbalance(bidQuantity, askQuantity)).toThrow(RangeError);
+    });
+  });
+
+  test('Should reject values that are not safe integers', () => {
+    [
+      [1.5, 2],
+      [2, 1.5],
+      [NaN, 1],
+      [1, Infinity],
+      [Number.MAX_SAFE_INTEGER + 1, 1],
+    ].forEach(([bidQuantity, askQuantity]) => {
+      expect(() => calculateOrderBookImbalance(bidQuantity, askQuantity)).toThrow(RangeError);
+    });
+  });
+
+  test('Should reject a combined quantity beyond the safe integer range', () => {
+    expect(() => calculateOrderBookImbalance(Number.MAX_SAFE_INTEGER, 1)).toThrow(RangeError);
   });
 });

@@ -62,3 +62,24 @@ export function calculateVWAP(totalTradeValue: number, totalTradeQuantity: numbe
   assertPositive(totalTradeValue);
   return totalTradeValue / totalTradeQuantity;
 }
+
+/*
+ * (bidQuantity − askQuantity) / (bidQuantity + askQuantity)
+ * using the latest available buying and selling quantities.
+ */
+export function calculateOrderBookImbalance(
+  bidQuantity: number,
+  askQuantity: number,
+): number | null {
+  assertIntegers(bidQuantity, askQuantity);
+  assertNonNegative(bidQuantity, askQuantity);
+
+  const totalQuantity = bidQuantity + askQuantity;
+  assertIntegers(totalQuantity);
+
+  if (totalQuantity === 0) {
+    return null;
+  }
+
+  return (bidQuantity - askQuantity) / totalQuantity;
+}
