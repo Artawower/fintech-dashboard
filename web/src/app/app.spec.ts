@@ -43,7 +43,7 @@ describe('App', () => {
     expect(element.querySelector('a[href="#/settings"]')).toBeTruthy();
     expect(element.querySelector('a.menu-active[href="#/dashboard"]')).toBeTruthy();
     expect(element.textContent).toContain('Market feed: running');
-    expect(element.querySelector('section.card button')?.textContent?.trim()).toBe('Pause');
+    expect(element.querySelector('button[aria-label="Pause market feed"]')?.textContent?.trim()).toBe('Pause');
   });
 
   it('should navigate to the settings form and mark its route active', async () => {

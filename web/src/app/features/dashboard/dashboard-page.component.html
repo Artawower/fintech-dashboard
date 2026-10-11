@@ -1,23 +1,41 @@
-<section class="card bg-base-100 shadow" aria-labelledby="dashboard-title">
-  <div class="card-body">
-    <h1 id="dashboard-title" class="card-title">Dashboard</h1>
+<main class="space-y-6" aria-labelledby="dashboard-title">
+  <header class="flex items-center justify-between gap-4">
+    <h1 id="dashboard-title" class="text-2xl font-bold">Dashboard</h1>
 
-    <div class="flex items-center gap-4">
-      <p aria-live="polite">Market feed: {{ marketFeed.status() }}</p>
+    <div class="flex flex-wrap items-center gap-3">
+      <span
+        class="badge badge-outline capitalize"
+        [class.badge-success]="marketFeed.status() === 'running'"
+        [class.badge-warning]="marketFeed.status() === 'paused'"
+        [class.badge-error]="marketFeed.status() === 'error'"
+        aria-live="polite"
+      >
+        Market feed: {{ marketFeed.status() }}
+      </span>
 
       @if (marketFeed.status() === 'running' || marketFeed.status() === 'paused') {
         <button
           type="button"
-          [class]="marketFeed.status() === 'running' ? 'btn btn-outline' : 'btn btn-primary'"
+          class="btn"
+          [class.btn-outline]="marketFeed.status() === 'running'"
+          [class.btn-primary]="marketFeed.status() === 'paused'"
+          [attr.aria-label]="marketFeed.status() === 'running' ? 'Pause market feed' : 'Resume market feed'"
           (click)="togglePause()"
         >
           {{ marketFeed.status() === 'running' ? 'Pause' : 'Resume' }}
         </button>
       }
     </div>
+  </header>
 
-    @if (marketFeed.error(); as error) {
-      <p role="alert" class="text-error">{{ error }}</p>
-    }
-  </div>
-</section>
+  @if (marketFeed.error(); as error) {
+    <div role="alert" class="alert alert-error">
+      <span>{{ error }}</span>
+    </div>
+  }
+
+  <app-instrument-statistics-table
+    [statistics]="marketFeed.statistics()"
+    [error]="marketFeed.error()"
+  />
+</main>

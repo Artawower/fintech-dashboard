@@ -1,7 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { MarketFeedService } from '../../core/services/market-feed.service';
+import { InstrumentStatisticsTable } from './components/instrument-statistics-table.component';
 
 @Component({
+  imports: [InstrumentStatisticsTable],
   selector: 'app-dashboard-page',
   templateUrl: './dashboard-page.component.html',
 })

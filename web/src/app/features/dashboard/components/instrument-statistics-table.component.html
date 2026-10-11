@@ -1,0 +1,85 @@
+<section class="card bg-base-100 shadow" aria-labelledby="statistics-title">
+  <div class="card-body p-0 sm:p-6">
+    <div class="flex items-center justify-between gap-4 px-4 pt-4 sm:px-0 sm:pt-0">
+      <div>
+        <h2 id="statistics-title" class="card-title">Instrument statistics</h2>
+        <p class="text-sm text-base-content/70">Latest prices and cumulative trading metrics.</p>
+      </div>
+      <span class="badge badge-ghost shrink-0">
+        {{ statistics().length }}
+        {{ statistics().length === 1 ? 'instrument' : 'instruments' }}
+      </span>
+    </div>
+
+    <div class="mt-4 overflow-x-auto">
+      <table class="table table-zebra min-w-[56rem]" aria-label="Live market statistics">
+        <caption class="sr-only">
+          Current-run market statistics for each instrument. Prices and spread are in US dollars.
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Instrument</th>
+            <th scope="col" class="text-right">Last traded price</th>
+            <th scope="col" class="text-right">Bid–ask spread</th>
+            <th scope="col" class="text-right">Trading volume</th>
+            <th scope="col" class="text-right">VWAP</th>
+            <th scope="col" class="text-right">Order-book imbalance</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (statistics().length === 0) {
+            <tr>
+              <td colspan="6" class="py-10 text-center text-base-content/60" role="status">
+                @if (error()) {
+                  Instrument statistics are unavailable.
+                } @else {
+                  Initializing instrument statistics…
+                }
+              </td>
+            </tr>
+          } @else {
+            @for (instrument of statistics(); track instrument.instrument) {
+              <tr>
+                <th scope="row" class="font-semibold">{{ instrument.instrument }}</th>
+                <td class="text-right font-mono tabular-nums">
+                  @if (instrument.lastPriceCents === null) {
+                    <span aria-label="Unavailable">—</span>
+                  } @else {
+                    <span>{{ (instrument.lastPriceCents / 100) | currency: 'USD' }}</span>
+                  }
+                </td>
+                <td class="text-right font-mono tabular-nums">
+                  @if (instrument.spreadCents === null) {
+                    <span aria-label="Unavailable">—</span>
+                  } @else {
+                    <span>{{ (instrument.spreadCents / 100) | currency: 'USD' }}</span>
+                  }
+                </td>
+                <td class="text-right font-mono tabular-nums">{{ instrument.tradingVolume | number }}</td>
+                <td class="text-right font-mono tabular-nums">
+                  @if (instrument.vwapCents === null) {
+                    <span aria-label="Unavailable">—</span>
+                  } @else {
+                    <span>{{ (instrument.vwapCents / 100) | currency: 'USD' }}</span>
+                  }
+                </td>
+                  <td class="text-right font-mono tabular-nums">
+                    @if (instrument.orderBookImbalance === null) {
+                      <span aria-label="Unavailable">—</span>
+                    } @else {
+                      <span
+                        [class.text-success]="instrument.orderBookImbalance > 0"
+                        [class.text-error]="instrument.orderBookImbalance < 0"
+                      >
+                        @if (instrument.orderBookImbalance > 0) {<span>+</span>}{{ instrument.orderBookImbalance | number: '1.2-2' }}
+                      </span>
+                    }
+                  </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
