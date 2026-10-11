@@ -1,5 +1,6 @@
 import {
   calculateBidAskSpread,
+  calculateVWAP,
   InvalidPriceRange,
   sumTradingVolume,
 } from './market-statistic';
@@ -72,6 +73,47 @@ describe('Spread calculation', () => {
       [Number.MAX_SAFE_INTEGER + 1, 10],
     ].forEach(([bid, ask]) => {
       expect(() => calculateBidAskSpread(bid, ask)).toThrow(RangeError);
+    });
+  });
+});
+
+describe('VWAP calculation', () => {
+  test('Should calculate the VWAP from all trades since the current run started', () => {
+    const totalTradeValue = 10000 * 10 + 10200 * 30;
+    expect(calculateVWAP(totalTradeValue, 40)).toBe(10150);
+  });
+
+  test('Should calculate VWAP for a single trade', () => {
+    expect(calculateVWAP(10200 * 30, 30)).toBe(10200);
+  });
+
+  test('Should return unavailable when total trade quantity is zero', () => {
+    expect(calculateVWAP(0, 0)).toBeNull();
+  });
+
+  test('Should reject zero trade value when trade quantity is positive', () => {
+    expect(() => calculateVWAP(0, 1)).toThrow(RangeError);
+  });
+
+  test('Should preserve fractional cents for display rounding', () => {
+    expect(calculateVWAP(4, 3)).toBeCloseTo(4 / 3);
+  });
+
+  test('Should reject negative total trade value or quantity', () => {
+    [[-1, 1], [1, -1]].forEach(([totalTradeValue, totalTradeQuantity]) => {
+      expect(() => calculateVWAP(totalTradeValue, totalTradeQuantity)).toThrow(RangeError);
+    });
+  });
+
+  test('Should reject values that are not safe integers', () => {
+    [
+      [1.5, 2],
+      [2, 1.5],
+      [NaN, 1],
+      [1, Infinity],
+      [Number.MAX_SAFE_INTEGER + 1, 1],
+    ].forEach(([totalTradeValue, totalTradeQuantity]) => {
+      expect(() => calculateVWAP(totalTradeValue, totalTradeQuantity)).toThrow(RangeError);
     });
   });
 });

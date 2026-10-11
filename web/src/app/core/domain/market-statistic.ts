@@ -45,3 +45,20 @@ export function sumTradingVolume(currentVolume: number, tradeQuantity: number): 
   assertNonNegative(totalVolume);
   return totalVolume;
 }
+
+/*
+ * Volume-weighted average price (VWAP)
+ * sum(tradePrice × tradeQuantity) / sum(tradeQuantity)
+ * since the current run started. Larger trades contribute more.
+ */
+export function calculateVWAP(totalTradeValue: number, totalTradeQuantity: number): number | null {
+  assertIntegers(totalTradeValue, totalTradeQuantity);
+  assertNonNegative(totalTradeValue, totalTradeQuantity);
+
+  if (totalTradeQuantity === 0) {
+    return null;
+  }
+
+  assertPositive(totalTradeValue);
+  return totalTradeValue / totalTradeQuantity;
+}
