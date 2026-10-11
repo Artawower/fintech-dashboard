@@ -12,7 +12,7 @@
     </div>
 
     <div class="mt-4 overflow-x-auto">
-      <table class="table table-zebra min-w-[56rem]" aria-label="Live market statistics">
+      <table class="table table-zebra table-fixed min-w-[56rem]" aria-label="Live market statistics">
         <caption class="sr-only">
           Current-run market statistics for each instrument. Prices and spread are in US dollars.
         </caption>
@@ -42,39 +42,36 @@
               <tr>
                 <th scope="row" class="font-semibold">{{ instrument.instrument }}</th>
                 <td class="text-right font-mono tabular-nums">
-                  @if (instrument.lastPriceCents === null) {
-                    <span aria-label="Unavailable">—</span>
-                  } @else {
-                    <span>{{ instrument.lastPriceCents | centsToDollars | currency: 'USD' }}</span>
-                  }
+                  <span [attr.aria-label]="unavailableAriaLabel(instrument.lastPriceCents)">
+                    {{ instrument.lastPriceCents | centsToDollars }}
+                  </span>
                 </td>
                 <td class="text-right font-mono tabular-nums">
-                  @if (instrument.spreadCents === null) {
-                    <span aria-label="Unavailable">—</span>
-                  } @else {
-                    <span>{{ instrument.spreadCents | centsToDollars | currency: 'USD' }}</span>
-                  }
+                  <span [attr.aria-label]="unavailableAriaLabel(instrument.spreadCents)">
+                    {{ instrument.spreadCents | centsToDollars }}
+                  </span>
                 </td>
-                <td class="text-right font-mono tabular-nums">{{ instrument.tradingVolume | number }}</td>
                 <td class="text-right font-mono tabular-nums">
-                  @if (instrument.vwapCents === null) {
-                    <span aria-label="Unavailable">—</span>
-                  } @else {
-                    <span>{{ instrument.vwapCents | centsToDollars | currency: 'USD' }}</span>
-                  }
+                  {{ instrument.tradingVolume | number }}
                 </td>
-                  <td class="text-right font-mono tabular-nums">
-                    @if (instrument.orderBookImbalance === null) {
-                      <span aria-label="Unavailable">—</span>
-                    } @else {
-                      <span
-                        [class.text-success]="instrument.orderBookImbalance > 0"
-                        [class.text-error]="instrument.orderBookImbalance < 0"
-                      >
-                        @if (instrument.orderBookImbalance > 0) {<span>+</span>}{{ instrument.orderBookImbalance | number: '1.2-2' }}
-                      </span>
-                    }
-                  </td>
+                <td class="text-right font-mono tabular-nums">
+                  <span [attr.aria-label]="unavailableAriaLabel(instrument.vwapCents)">
+                    {{ instrument.vwapCents | centsToDollars }}
+                  </span>
+                </td>
+                <td class="text-right font-mono tabular-nums">
+                  <span
+                    [class.text-success]="(instrument.orderBookImbalance ?? 0) > 0"
+                    [class.text-error]="(instrument.orderBookImbalance ?? 0) < 0"
+                    [attr.aria-label]="unavailableAriaLabel(instrument.orderBookImbalance)"
+                  >
+                    {{
+                      instrument.orderBookImbalance === null
+                        ? '—'
+                        : ((instrument.orderBookImbalance > 0 ? '+' : '') + (instrument.orderBookImbalance | number: '1.2-2'))
+                    }}
+                  </span>
+                </td>
               </tr>
             }
           }
