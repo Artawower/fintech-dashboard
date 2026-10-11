@@ -80,10 +80,12 @@ export class Generator {
     const direction = choice([-1, 1]);
     const diff = randIntRange(0, this.config.maxPercentDiff);
 
-    const changeDiffCents = direction * <i32>Math.round(<f64>price * (<f64>diff / 100.0));
-    const nextPrice = price + changeDiffCents;
+    const changeDiffCents = <f64>direction * Math.round(<f64>price * (<f64>diff / 100.0));
 
-    return nextPrice;
+    const nextPrice = <f64>price + changeDiffCents;
+    const maxBidCents = <f64>i32.MAX_VALUE - <f64>this.config.maxNextSpread;
+
+    return <i32>Math.min(maxBidCents, Math.max(1.0, nextPrice));
   }
 
   private saveMarketUpdate(update: MarketUpdate): void {

@@ -199,3 +199,17 @@ test('Should keep separate price history for each instrument', () => {
   expect(Object.keys(previousPrices).length).toBeGreaterThan(1);
   expect(repeatedUpdates).toBeGreaterThan(0);
 });
+
+test('Should avoid integer overflow', () => {
+  initWithSeed(1, 2170);
+
+  const updates = [...generate(1000), ...generate(1000)];
+
+  updates.forEach((u, i) => {
+    const ctx = `Update ${i}`;
+
+    expect(u.priceCents, ctx).toBeGreaterThan(0);
+    expect(u.bidCents, ctx).toBeGreaterThan(0);
+    expect(u.askCents).toBeGreaterThan(0);
+  });
+});
