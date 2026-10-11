@@ -45,14 +45,14 @@
                   @if (instrument.lastPriceCents === null) {
                     <span aria-label="Unavailable">—</span>
                   } @else {
-                    <span>{{ (instrument.lastPriceCents / 100) | currency: 'USD' }}</span>
+                    <span>{{ instrument.lastPriceCents | centsToDollars | currency: 'USD' }}</span>
                   }
                 </td>
                 <td class="text-right font-mono tabular-nums">
                   @if (instrument.spreadCents === null) {
                     <span aria-label="Unavailable">—</span>
                   } @else {
-                    <span>{{ (instrument.spreadCents / 100) | currency: 'USD' }}</span>
+                    <span>{{ instrument.spreadCents | centsToDollars | currency: 'USD' }}</span>
                   }
                 </td>
                 <td class="text-right font-mono tabular-nums">{{ instrument.tradingVolume | number }}</td>
@@ -60,7 +60,7 @@
                   @if (instrument.vwapCents === null) {
                     <span aria-label="Unavailable">—</span>
                   } @else {
-                    <span>{{ (instrument.vwapCents / 100) | currency: 'USD' }}</span>
+                    <span>{{ instrument.vwapCents | centsToDollars | currency: 'USD' }}</span>
                   }
                 </td>
                   <td class="text-right font-mono tabular-nums">
