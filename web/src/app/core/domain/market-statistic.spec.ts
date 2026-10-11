@@ -1,4 +1,34 @@
-import { calculateBidAskSpread, InvalidPriceRange, NegativePrice } from './market-statistic';
+import {
+  calculateBidAskSpread,
+  InvalidPriceRange,
+  sumTradingVolume,
+} from './market-statistic';
+
+describe('Trading volume', () => {
+  test('Should add a trade quantity to the current volume', () => {
+    expect(sumTradingVolume(0, 30)).toBe(30);
+  });
+
+  test('Should preserve the existing volume when adding a trade', () => {
+    expect(sumTradingVolume(40, 30)).toBe(70);
+  });
+
+  test('Should reject an invalid current volume', () => {
+    [-1, 1.5, NaN, Infinity].forEach((volume) => {
+      expect(() => sumTradingVolume(volume, 1)).toThrow(RangeError);
+    });
+  });
+
+  test('Should reject an invalid trade quantity', () => {
+    [0, -1, 1.5, NaN, Infinity].forEach((quantity) => {
+      expect(() => sumTradingVolume(0, quantity)).toThrow(RangeError);
+    });
+  });
+
+  test('Should reject a total beyond the safe integer range', () => {
+    expect(() => sumTradingVolume(Number.MAX_SAFE_INTEGER, 1)).toThrow(RangeError);
+  });
+});
 
 describe('Spread calculation', () => {
   test('Should calculate the bid–ask spread', () => {
@@ -25,7 +55,7 @@ describe('Spread calculation', () => {
       [-10, -5],
       [0, 10],
     ].forEach(([bid, ask]) => {
-      expect(() => calculateBidAskSpread(bid, ask)).toThrow(NegativePrice);
+      expect(() => calculateBidAskSpread(bid, ask)).toThrow(RangeError);
     });
   });
 
@@ -39,8 +69,9 @@ describe('Spread calculation', () => {
       [NaN, NaN],
       [10, Infinity],
       [Infinity, 10],
+      [Number.MAX_SAFE_INTEGER + 1, 10],
     ].forEach(([bid, ask]) => {
-      expect(() => calculateBidAskSpread(bid, ask)).toThrow(NegativePrice);
+      expect(() => calculateBidAskSpread(bid, ask)).toThrow(RangeError);
     });
   });
 });
