@@ -12,17 +12,18 @@ let fixture: ComponentFixture<DashboardPage>;
 let status: ReturnType<typeof signal<MarketFeedStatus>>;
 let error: ReturnType<typeof signal<string | null>>;
 let statistics$: BehaviorSubject<InstrumentStatistics[]>;
+let instruments: ReturnType<typeof signal<readonly string[]>>;
 let pause: ReturnType<typeof vi.fn>;
 let resume: ReturnType<typeof vi.fn>;
 let animationFrames: Map<number, FrameRequestCallback>;
 let nextAnimationFrameId: number;
 
 function sampleStatistics(
-  instrument: string,
+  instrumentIndex: number,
   lastPriceCents = 10200,
 ): InstrumentStatistics[] {
   return [{
-    instrument,
+    instrumentIndex,
     lastPriceCents,
     spreadCents: 4,
     tradingVolume: 40,
@@ -51,6 +52,7 @@ beforeEach(async () => {
   status = signal<MarketFeedStatus>('running');
   error = signal<string | null>(null);
   statistics$ = new BehaviorSubject<InstrumentStatistics[]>([]);
+  instruments = signal<readonly string[]>(['ALFA', 'BETA']);
   pause = vi.fn(() => status.set('paused'));
   resume = vi.fn(() => status.set('running'));
 
@@ -59,7 +61,7 @@ beforeEach(async () => {
     providers: [
       {
         provide: MarketFeedService,
-        useValue: { status, error, statistics$, pause, resume },
+        useValue: { status, error, statistics$, instruments, pause, resume },
       },
     ],
   }).compileComponents();
@@ -82,7 +84,7 @@ test('Should show the running feed and pause control', () => {
 });
 
 test('Should display all market metrics for each instrument', () => {
-  statistics$.next(sampleStatistics('ALFA'));
+  statistics$.next(sampleStatistics(0));
   fixture.detectChanges();
 
   const element = fixture.nativeElement as HTMLElement;
@@ -99,7 +101,7 @@ test('Should display all market metrics for each instrument', () => {
 
 test('Should show unavailable prices and zero volume before the first trade', () => {
   statistics$.next([{
-    instrument: 'BETA',
+    instrumentIndex: 1,
     lastPriceCents: null,
     spreadCents: null,
     tradingVolume: 0,
@@ -116,8 +118,8 @@ test('Should show unavailable prices and zero volume before the first trade', ()
 });
 
 test('Should render the latest statistics snapshot scheduled for an animation frame', () => {
-  const firstSnapshot = sampleStatistics('ALFA');
-  const latestSnapshot = sampleStatistics('BETA', 14500);
+  const firstSnapshot = sampleStatistics(0);
+  const latestSnapshot = sampleStatistics(1, 14500);
 
   statistics$.next(firstSnapshot);
   statistics$.next(latestSnapshot);

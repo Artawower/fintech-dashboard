@@ -25,28 +25,14 @@ async function instantiate(module, imports = {}) {
   const memory = exports.memory || imports.env.memory;
   const adaptedExports = Object.setPrototypeOf({
     generate(batchSize) {
-      // assembly/index/generate(i32) => ~lib/array/Array<assembly/models/market-update.model/MarketUpdate>
-      return __liftArray(pointer => __liftRecord6(__getU32(pointer)), 2, exports.generate(batchSize) >>> 0);
+      // assembly/index/generate(i32) => ~lib/staticarray/StaticArray<i32>
+      return __liftStaticArray(__getI32, 2, exports.generate(batchSize) >>> 0);
     },
     getInstruments() {
       // assembly/index/getInstruments() => ~lib/array/Array<~lib/string/String>
       return __liftArray(pointer => __liftString(__getU32(pointer)), 2, exports.getInstruments() >>> 0);
     },
   }, exports);
-  function __liftRecord6(pointer) {
-    // assembly/models/market-update.model/MarketUpdate
-    // Hint: Opt-out from lifting as a record by providing an empty constructor
-    if (!pointer) return null;
-    return {
-      instrument: __liftString(__getU32(pointer + 0)),
-      priceCents: __getI32(pointer + 4),
-      tradeQuantity: __getI32(pointer + 8),
-      bidCents: __getI32(pointer + 12),
-      askCents: __getI32(pointer + 16),
-      bidQuantity: __getI32(pointer + 20),
-      askQuantity: __getI32(pointer + 24),
-    };
-  }
   function __liftString(pointer) {
     if (!pointer) return null;
     const
@@ -65,6 +51,14 @@ async function instantiate(module, imports = {}) {
       length = __dataview.getUint32(pointer + 12, true),
       values = new Array(length);
     for (let i = 0; i < length; ++i) values[i] = liftElement(dataStart + (i << align >>> 0));
+    return values;
+  }
+  function __liftStaticArray(liftElement, align, pointer) {
+    if (!pointer) return null;
+    const
+      length = __getU32(pointer - 4) >>> align,
+      values = new Array(length);
+    for (let i = 0; i < length; ++i) values[i] = liftElement(pointer + (i << align >>> 0));
     return values;
   }
   let __dataview = new DataView(memory.buffer);

@@ -1,5 +1,6 @@
 import { beforeEach, expect, test } from 'vitest';
 import { init as initWithSeed, generate, getInstruments } from '../build/release';
+import { MarketUpdateField } from '../assembly/market-update-layout';
 import {
   DEFAULT_MAX_BOOK_QUANTITY,
   DEFAULT_MAX_NEXT_SPREAD,
@@ -14,7 +15,41 @@ const seed = 27;
 const defaultInstrumentCount = 10;
 const testBatchSizes = [0, 1, 5, 10, 20, 50, 100, 1000];
 
+interface MarketUpdate {
+  instrument: string;
+  priceCents: number;
+  tradeQuantity: number;
+  bidCents: number;
+  askCents: number;
+  bidQuantity: number;
+  askQuantity: number;
+}
+
 const init = (instrumentCount: number) => initWithSeed(instrumentCount, seed);
+
+function decodeUpdates(values: ArrayLike<number>): MarketUpdate[] {
+  const instruments = getInstruments();
+  const updates: MarketUpdate[] = [];
+
+  for (let offset = 0; offset < values.length; offset += MarketUpdateField.Count) {
+    const instrumentIndex = values[offset + MarketUpdateField.InstrumentIndex];
+    updates.push({
+      instrument: instruments[instrumentIndex],
+      priceCents: values[offset + MarketUpdateField.PriceCents],
+      tradeQuantity: values[offset + MarketUpdateField.TradeQuantity],
+      bidCents: values[offset + MarketUpdateField.BidCents],
+      askCents: values[offset + MarketUpdateField.AskCents],
+      bidQuantity: values[offset + MarketUpdateField.BidQuantity],
+      askQuantity: values[offset + MarketUpdateField.AskQuantity],
+    });
+  }
+
+  return updates;
+}
+
+function generateUpdates(batchSize: number): MarketUpdate[] {
+  return decodeUpdates(generate(batchSize));
+}
 
 beforeEach(() => {
   init(defaultInstrumentCount);
@@ -58,20 +93,21 @@ test('Should return same random instruments each run', () => {
 test('Should generate batch with exact size', () => {
   testBatchSizes.forEach((batchSize) => {
     const updates = generate(batchSize);
-    expect(updates.length).toBe(batchSize);
+    expect(updates.length).toBe(batchSize * MarketUpdateField.Count);
+    expect(decodeUpdates(updates)).toHaveLength(batchSize);
   });
 });
 
 test('Should return non empty array with generated data', () => {
-  const updates = generate(30);
-  updates.forEach((u) => {
-    expect(u).toBeTruthy();
+  const updates = generateUpdates(30);
+  updates.forEach((update) => {
+    expect(update).toBeTruthy();
   });
 });
 
 test('Should reference initialized instruments', () => {
   const instruments = new Set(getInstruments());
-  const updates = generate(100);
+  const updates = generateUpdates(100);
 
   updates.forEach((update) => {
     expect(instruments.has(update.instrument)).toBe(true);
@@ -79,7 +115,7 @@ test('Should reference initialized instruments', () => {
 });
 
 test('Should generate spread within configured bounds', () => {
-  const updates = generate(500);
+  const updates = generateUpdates(500);
   updates.forEach((update) => {
     const spread = update.askCents - update.bidCents;
 
@@ -89,14 +125,14 @@ test('Should generate spread within configured bounds', () => {
 });
 
 test('Should generate trade price as bid or ask', () => {
-  const updates = generate(100);
+  const updates = generateUpdates(100);
   updates.forEach((update) => {
     expect([update.bidCents, update.askCents]).toContain(update.priceCents);
   });
 });
 
 test('Should generate positive prices', () => {
-  const updates = generate(100);
+  const updates = generateUpdates(100);
 
   updates.forEach((update) => {
     expect(update.bidCents).toBeGreaterThan(0);
@@ -106,7 +142,7 @@ test('Should generate positive prices', () => {
 });
 
 test('Should generate book quantities within configured bounds', () => {
-  const updates = generate(100);
+  const updates = generateUpdates(100);
 
   updates.forEach((update) => {
     expect(update.bidQuantity).toBeGreaterThanOrEqual(DEFAULT_MIN_BOOK_QUANTITY);
@@ -117,7 +153,7 @@ test('Should generate book quantities within configured bounds', () => {
 });
 
 test('Should generate book quantities independently from trade quantity', () => {
-  const updates = generate(100);
+  const updates = generateUpdates(100);
 
   expect(
     updates.some((update) => update.bidQuantity + update.askQuantity !== update.tradeQuantity),
@@ -125,7 +161,7 @@ test('Should generate book quantities independently from trade quantity', () => 
 });
 
 test('Should generate trade quantity within configured bounds', () => {
-  const updates = generate(100);
+  const updates = generateUpdates(100);
 
   updates.forEach((update) => {
     expect(update.tradeQuantity).toBeGreaterThanOrEqual(DEFAULT_MIN_TRADE_QUANTITY);
@@ -135,7 +171,7 @@ test('Should generate trade quantity within configured bounds', () => {
 
 test('Should limit bid price change to defaultMaxPercentDiff', () => {
   init(1);
-  const updates = generate(100);
+  const updates = generateUpdates(100);
 
   updates.slice(1).forEach((update, index) => {
     const previousPrice = updates[index].priceCents;
@@ -147,21 +183,21 @@ test('Should limit bid price change to defaultMaxPercentDiff', () => {
 });
 
 test('Should generate same market updates with same seed', () => {
-  const firstRun = generate(100);
+  const firstRun = generateUpdates(100);
   init(defaultInstrumentCount);
-  const secondRun = generate(100);
+  const secondRun = generateUpdates(100);
 
   expect(secondRun).toEqual(firstRun);
 });
 
 test('Generated updates should match the previous snapshot', () => {
-  const updates = generate(30);
+  const updates = generateUpdates(30);
   expect(updates).toMatchSnapshot();
 });
 
 test('Should use previous trade price for next update of same instrument', () => {
   init(1);
-  const [firstUpdate, secondUpdate] = generate(2);
+  const [firstUpdate, secondUpdate] = generateUpdates(2);
 
   const maxChange = Math.round((firstUpdate.priceCents * DEFAULT_MAX_PERCENT_DIFF) / 100);
 
@@ -171,8 +207,8 @@ test('Should use previous trade price for next update of same instrument', () =>
 
 test('Should keep previous trade price between generated batches', () => {
   init(1);
-  const [firstUpdate] = generate(1);
-  const [secondUpdate] = generate(1);
+  const [firstUpdate] = generateUpdates(1);
+  const [secondUpdate] = generateUpdates(1);
   const maxChange = Math.round((firstUpdate.priceCents * DEFAULT_MAX_PERCENT_DIFF) / 100);
 
   expect(Math.abs(secondUpdate.bidCents - firstUpdate.priceCents)).toBeLessThanOrEqual(maxChange);
@@ -180,7 +216,7 @@ test('Should keep previous trade price between generated batches', () => {
 
 test('Should keep separate price history for each instrument', () => {
   init(2);
-  const updates = generate(100);
+  const updates = generateUpdates(100);
   const previousPrices: { [key: string]: number } = {};
   let repeatedUpdates = 0;
 
@@ -203,13 +239,13 @@ test('Should keep separate price history for each instrument', () => {
 test('Should avoid integer overflow', () => {
   initWithSeed(1, 2170);
 
-  const updates = [...generate(1000), ...generate(1000)];
+  const updates = [...generateUpdates(1000), ...generateUpdates(1000)];
 
-  updates.forEach((u, i) => {
+  updates.forEach((update, i) => {
     const ctx = `Update ${i}`;
 
-    expect(u.priceCents, ctx).toBeGreaterThan(0);
-    expect(u.bidCents, ctx).toBeGreaterThan(0);
-    expect(u.askCents).toBeGreaterThan(0);
+    expect(update.priceCents, ctx).toBeGreaterThan(0);
+    expect(update.bidCents, ctx).toBeGreaterThan(0);
+    expect(update.askCents).toBeGreaterThan(0);
   });
 });

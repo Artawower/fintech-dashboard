@@ -1,5 +1,5 @@
 export interface InstrumentStatistics {
-  instrument: string;
+  instrumentIndex: number;
   lastPriceCents: number | null;
   spreadCents: number | null;
   tradingVolume: number;

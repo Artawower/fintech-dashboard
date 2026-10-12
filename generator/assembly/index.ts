@@ -1,7 +1,7 @@
 // The entry file of your WebAssembly module.
 
 import { Generator } from './generator';
-import { GeneratorConfig, MarketUpdate } from './models';
+import { GeneratorConfig } from './models';
 
 let generator: Generator | null = null;
 
@@ -15,7 +15,7 @@ function assertGenerator(): void {
   assert(generator !== null, 'Init should be called before generation process');
 }
 
-export function generate(batchSize: i32): MarketUpdate[] {
+export function generate(batchSize: i32): StaticArray<i32> {
   assertGenerator();
   assert(batchSize >= 0, 'Batch size should not be negative');
   return generator!.generate(batchSize);

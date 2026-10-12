@@ -36,5 +36,9 @@
     </div>
   }
 
-  <app-instrument-statistics-table [statistics]="statistics()" [error]="marketFeed.error()" />
+  <app-instrument-statistics-table
+    [statistics]="statistics()"
+    [instruments]="marketFeed.instruments()"
+    [error]="marketFeed.error()"
+  />
 </main>

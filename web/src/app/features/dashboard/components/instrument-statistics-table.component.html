@@ -46,9 +46,11 @@
               </td>
             </tr>
           } @else {
-            @for (instrument of statistics(); track instrument.instrument) {
+            @for (instrument of statistics(); track instrument.instrumentIndex) {
               <tr>
-                <th scope="row" class="font-semibold">{{ instrument.instrument }}</th>
+                <th scope="row" class="font-semibold">
+                  {{ instruments()[instrument.instrumentIndex] ?? 'Unknown instrument' }}
+                </th>
                 <td class="text-right font-mono tabular-nums">
                   <span [attr.aria-label]="unavailableAriaLabel(instrument.lastPriceCents)">
                     {{ instrument.lastPriceCents | centsToDollars }}
@@ -76,7 +78,7 @@
                     {{
                       instrument.orderBookImbalance === null
                         ? '—'
-                        : (instrument.orderBookImbalance > 0 ? '+' : '') +
+                        : (instrument.orderBookImbalance &gt; 0 ? '+' : '') +
                           (instrument.orderBookImbalance | number: '1.2-2')
                     }}
                   </span>

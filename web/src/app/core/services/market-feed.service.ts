@@ -16,6 +16,7 @@ export class MarketFeedService {
 
   private readonly _statistics$ = new BehaviorSubject<InstrumentStatistics[]>([]);
 
+  public readonly instruments = signal<readonly string[]>([]);
   public readonly status = signal<MarketFeedStatus>('idle');
   public readonly error = signal<string | null>(null);
   public readonly statistics$ = this._statistics$.asObservable();
@@ -65,6 +66,7 @@ export class MarketFeedService {
   private startRun(settings: MarketSettings): void {
     const runId = ++this.currentRunId;
     this.status.set('running');
+    this.instruments.set([]);
     this._statistics$.next([]);
     this.error.set(null);
     this.worker?.postMessage({
@@ -78,6 +80,10 @@ export class MarketFeedService {
     if (message.runId !== this.currentRunId) return;
     if (message.type === 'ERROR') {
       this.fail(message.error);
+      return;
+    }
+    if (message.type === 'INSTRUMENTS') {
+      this.instruments.set(message.instruments);
       return;
     }
 

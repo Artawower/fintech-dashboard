@@ -10,6 +10,7 @@ import { CentsToDollarsPipe } from '@app/shared/pipes/cents-to-dollars.pipe';
 })
 export class InstrumentStatisticsTable {
   public readonly statistics = input.required<InstrumentStatistics[]>();
+  public readonly instruments = input.required<readonly string[]>();
   public readonly error = input<string | null>(null);
 
   public unavailableAriaLabel(value: number | null): string | null {

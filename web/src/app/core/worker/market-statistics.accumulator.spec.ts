@@ -4,42 +4,18 @@ describe('MarketStatisticsAccumulator', () => {
   test('Should accumulate completed statistics per instrument across batches', () => {
     const accumulator = new MarketStatisticsAccumulator(['ALFA', 'BETA']);
 
-    accumulator.processBatch([
-      {
-        instrument: 'ALFA',
-        priceCents: 10000,
-        tradeQuantity: 10,
-        bidCents: 9990,
-        askCents: 10000,
-        bidQuantity: 600,
-        askQuantity: 400,
-      },
-    ]);
+    accumulator.processBatch(new Uint32Array([0, 10000, 10, 9990, 10000, 600, 400]));
 
-    const statistics = accumulator.processBatch([
-      {
-        instrument: 'ALFA',
-        priceCents: 10200,
-        tradeQuantity: 30,
-        bidCents: 10196,
-        askCents: 10200,
-        bidQuantity: 400,
-        askQuantity: 600,
-      },
-      {
-        instrument: 'BETA',
-        priceCents: 20000,
-        tradeQuantity: 5,
-        bidCents: 19900,
-        askCents: 20000,
-        bidQuantity: 0,
-        askQuantity: 0,
-      },
-    ]);
+    const statistics = accumulator.processBatch(
+      new Uint32Array([
+        0, 10200, 30, 10196, 10200, 400, 600,
+        1, 20000, 5, 19900, 20000, 0, 0,
+      ]),
+    );
 
     expect(statistics).toEqual([
       {
-        instrument: 'ALFA',
+        instrumentIndex: 0,
         lastPriceCents: 10200,
         spreadCents: 4,
         tradingVolume: 40,
@@ -48,7 +24,7 @@ describe('MarketStatisticsAccumulator', () => {
         orderBookImbalance: -0.2,
       },
       {
-        instrument: 'BETA',
+        instrumentIndex: 1,
         lastPriceCents: 20000,
         spreadCents: 100,
         tradingVolume: 5,
@@ -62,9 +38,9 @@ describe('MarketStatisticsAccumulator', () => {
   test('Should initialize statistics for every instrument before updates arrive', () => {
     const accumulator = new MarketStatisticsAccumulator(['ALFA', 'BETA']);
 
-    expect(accumulator.processBatch([])).toEqual([
+    expect(accumulator.processBatch(new Uint32Array(0))).toEqual([
       {
-        instrument: 'ALFA',
+        instrumentIndex: 0,
         lastPriceCents: null,
         spreadCents: null,
         tradingVolume: 0,
@@ -73,7 +49,7 @@ describe('MarketStatisticsAccumulator', () => {
         orderBookImbalance: null,
       },
       {
-        instrument: 'BETA',
+        instrumentIndex: 1,
         lastPriceCents: null,
         spreadCents: null,
         tradingVolume: 0,
@@ -86,23 +62,13 @@ describe('MarketStatisticsAccumulator', () => {
 
   test('Should reset accumulated statistics for a new run', () => {
     const accumulator = new MarketStatisticsAccumulator(['ALFA']);
-    accumulator.processBatch([
-      {
-        instrument: 'ALFA',
-        priceCents: 10000,
-        tradeQuantity: 10,
-        bidCents: 9990,
-        askCents: 10000,
-        bidQuantity: 600,
-        askQuantity: 400,
-      },
-    ]);
+    accumulator.processBatch(new Uint32Array([0, 10000, 10, 9990, 10000, 600, 400]));
 
     accumulator.reset();
 
-    expect(accumulator.processBatch([])).toEqual([
+    expect(accumulator.processBatch(new Uint32Array(0))).toEqual([
       {
-        instrument: 'ALFA',
+        instrumentIndex: 0,
         lastPriceCents: null,
         spreadCents: null,
         tradingVolume: 0,

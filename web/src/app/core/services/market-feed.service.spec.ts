@@ -14,7 +14,7 @@ afterEach(() => {
 
 function sampleStatistics(): InstrumentStatistics[] {
   return [{
-    instrument: 'AAPL',
+    instrumentIndex: 0,
     lastPriceCents: 100,
     spreadCents: 2,
     tradingVolume: 2,
@@ -41,6 +41,21 @@ test('MarketFeedService starts a run with the default settings', () => {
 
   expect(worker.posted[0]).toEqual({ type: 'INIT', runId: 1, settings: DEFAULT_MARKET_SETTINGS });
   expect(service.status()).toBe('running');
+});
+
+test('MarketFeedService stores instrument labels only for the active run', () => {
+  const { worker, service, settings } = setup();
+  worker.emit({ type: 'INSTRUMENTS', runId: 1, instruments: ['ALFA'] });
+  expect(service.instruments()).toEqual(['ALFA']);
+
+  settings.updateSettings({ instrumentCount: 8, updatesPerBatch: 50, updateIntervalMs: 100 });
+  expect(service.instruments()).toEqual([]);
+
+  worker.emit({ type: 'INSTRUMENTS', runId: 1, instruments: ['STALE'] });
+  expect(service.instruments()).toEqual([]);
+
+  worker.emit({ type: 'INSTRUMENTS', runId: 2, instruments: ['BETA'] });
+  expect(service.instruments()).toEqual(['BETA']);
 });
 
 test('MarketFeedService emits statistics and clears them when settings change', () => {

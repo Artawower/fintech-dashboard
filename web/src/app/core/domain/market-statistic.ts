@@ -1,8 +1,7 @@
 import type { InstrumentStatistics } from '@app/core/models/instrument-statistics.model';
-import type { MarketUpdate } from '@app/core/models/market-update.model';
 
 export class InstrumentMismatchError extends Error {
-  public constructor(updateInstrument: string, statisticsInstrument: string) {
+  public constructor(updateInstrument: number, statisticsInstrument: number) {
     super(
       `Cannot apply an update for instrument "${updateInstrument}" to statistics for "${statisticsInstrument}".`,
     );
@@ -96,9 +95,9 @@ export function calculateOrderBookImbalance(
   return (bidQuantity - askQuantity) / totalQuantity;
 }
 
-export function createInstrumentStatistics(instrument: string): InstrumentStatistics {
+export function createInstrumentStatistics(instrumentIndex: number): InstrumentStatistics {
   return {
-    instrument,
+    instrumentIndex,
     lastPriceCents: null,
     spreadCents: null,
     tradingVolume: 0,
@@ -110,28 +109,34 @@ export function createInstrumentStatistics(instrument: string): InstrumentStatis
 
 export function updateInstrumentStatistics(
   current: InstrumentStatistics,
-  update: MarketUpdate,
+  instrumentIndex: number,
+  priceCents: number,
+  tradeQuantity: number,
+  bidCents: number,
+  askCents: number,
+  bidQuantity: number,
+  askQuantity: number,
 ): InstrumentStatistics {
-  if (current.instrument !== update.instrument) {
-    throw new InstrumentMismatchError(update.instrument, current.instrument);
+  if (current.instrumentIndex !== instrumentIndex) {
+    throw new InstrumentMismatchError(instrumentIndex, current.instrumentIndex);
   }
 
-  assertIntegers(current.totalTradeValue, update.priceCents);
+  assertIntegers(current.totalTradeValue, priceCents);
   assertNonNegative(current.totalTradeValue);
-  assertPositive(update.priceCents);
-  const spreadCents = calculateBidAskSpread(update.bidCents, update.askCents);
-  const tradingVolume = sumTradingVolume(current.tradingVolume, update.tradeQuantity);
-  const totalTradeValue = current.totalTradeValue + update.priceCents * update.tradeQuantity;
+  assertPositive(priceCents);
+  const spreadCents = calculateBidAskSpread(bidCents, askCents);
+  const tradingVolume = sumTradingVolume(current.tradingVolume, tradeQuantity);
+  const totalTradeValue = current.totalTradeValue + priceCents * tradeQuantity;
   assertIntegers(totalTradeValue);
   assertNonNegative(totalTradeValue);
 
   return {
-    instrument: update.instrument,
-    lastPriceCents: update.priceCents,
+    instrumentIndex,
+    lastPriceCents: priceCents,
     spreadCents,
     tradingVolume,
     totalTradeValue,
     vwapCents: calculateVWAP(totalTradeValue, tradingVolume),
-    orderBookImbalance: calculateOrderBookImbalance(update.bidQuantity, update.askQuantity),
+    orderBookImbalance: calculateOrderBookImbalance(bidQuantity, askQuantity),
   };
 }

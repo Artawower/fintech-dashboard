@@ -29,6 +29,7 @@ function reportError(runId: number, error: unknown): void {
     runId,
     error: error instanceof Error ? error.message : String(error),
   });
+  throw error;
 }
 
 function generateBatch(runId: number): void {
@@ -36,7 +37,11 @@ function generateBatch(runId: number): void {
 
   try {
     const updates = generator.generate(settings.updatesPerBatch);
-    post({ type: 'STATISTICS', runId, statistics: statistics.processBatch(updates) });
+    post({
+      type: 'STATISTICS',
+      runId,
+      statistics: statistics.processBatch(updates),
+    });
   } catch (error) {
     stop();
     reportError(runId, error);
@@ -67,11 +72,14 @@ async function initialize(message: Extract<WorkerInboundMessage, { type: 'INIT' 
 
     nextGenerator.init(message.settings.instrumentCount, Math.floor(Math.random() * 1_000_000));
     generator = nextGenerator;
-    statistics = new MarketStatisticsAccumulator(nextGenerator.getInstruments());
+
+    const instruments = nextGenerator.getInstruments();
+    statistics = new MarketStatisticsAccumulator(instruments);
+    post({ type: 'INSTRUMENTS', runId: message.runId, instruments });
     post({
       type: 'STATISTICS',
       runId: message.runId,
-      statistics: statistics.processBatch([]),
+      statistics: statistics.processBatch(new Uint32Array(0)),
     });
     start();
   } catch (error) {

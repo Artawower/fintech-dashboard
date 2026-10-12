@@ -169,8 +169,8 @@ describe('Order book imbalance calculation', () => {
 
 describe('Instrument statistics reducer', () => {
   test('Should initialize statistics before any update arrives', () => {
-    expect(createInstrumentStatistics('ALFA')).toEqual({
-      instrument: 'ALFA',
+    expect(createInstrumentStatistics(0)).toEqual({
+      instrumentIndex: 0,
       lastPriceCents: null,
       spreadCents: null,
       tradingVolume: 0,
@@ -181,28 +181,21 @@ describe('Instrument statistics reducer', () => {
   });
 
   test('Should update cumulative statistics without mutating previous state', () => {
-    const initial = createInstrumentStatistics('ALFA');
-    const afterFirstTrade = updateInstrumentStatistics(initial, {
-      instrument: 'ALFA',
-      priceCents: 10000,
-      tradeQuantity: 10,
-      bidCents: 9990,
-      askCents: 10000,
-      bidQuantity: 600,
-      askQuantity: 400,
-    });
-    const afterSecondTrade = updateInstrumentStatistics(afterFirstTrade, {
-      instrument: 'ALFA',
-      priceCents: 10200,
-      tradeQuantity: 30,
-      bidCents: 10196,
-      askCents: 10200,
-      bidQuantity: 400,
-      askQuantity: 600,
-    });
+    const initial = createInstrumentStatistics(0);
+    const afterFirstTrade = updateInstrumentStatistics(initial, 0, 10000, 10, 9990, 10000, 600, 400);
+    const afterSecondTrade = updateInstrumentStatistics(
+      afterFirstTrade,
+      0,
+      10200,
+      30,
+      10196,
+      10200,
+      400,
+      600,
+    );
 
     expect(afterSecondTrade).toEqual({
-      instrument: 'ALFA',
+      instrumentIndex: 0,
       lastPriceCents: 10200,
       spreadCents: 4,
       tradingVolume: 40,
@@ -215,45 +208,21 @@ describe('Instrument statistics reducer', () => {
     expect(afterFirstTrade.totalTradeValue).toBe(100000);
   });
 
-  test('Should reject an update for another instrument', () => {
+  test('Should reject an update for another instrument index', () => {
     expect(() =>
-      updateInstrumentStatistics(createInstrumentStatistics('ALFA'), {
-        instrument: 'BETA',
-        priceCents: 10200,
-        tradeQuantity: 30,
-        bidCents: 10196,
-        askCents: 10200,
-        bidQuantity: 400,
-        askQuantity: 600,
-      }),
+      updateInstrumentStatistics(createInstrumentStatistics(0), 1, 10200, 30, 10196, 10200, 400, 600),
     ).toThrow(InstrumentMismatchError);
   });
 
-  test('Should describe the instrument mismatch', () => {
+  test('Should describe the instrument index mismatch', () => {
     expect(() =>
-      updateInstrumentStatistics(createInstrumentStatistics('ALFA'), {
-        instrument: 'BETA',
-        priceCents: 10200,
-        tradeQuantity: 30,
-        bidCents: 10196,
-        askCents: 10200,
-        bidQuantity: 400,
-        askQuantity: 600,
-      }),
-    ).toThrow('Cannot apply an update for instrument "BETA" to statistics for "ALFA".');
+      updateInstrumentStatistics(createInstrumentStatistics(0), 1, 10200, 30, 10196, 10200, 400, 600),
+    ).toThrow('Cannot apply an update for instrument "1" to statistics for "0".');
   });
 
   test('Should reject a non-integer trade price', () => {
     expect(() =>
-      updateInstrumentStatistics(createInstrumentStatistics('ALFA'), {
-        instrument: 'ALFA',
-        priceCents: 10000.5,
-        tradeQuantity: 2,
-        bidCents: 9990,
-        askCents: 10000,
-        bidQuantity: 600,
-        askQuantity: 400,
-      }),
+      updateInstrumentStatistics(createInstrumentStatistics(0), 0, 10000.5, 2, 9990, 10000, 600, 400),
     ).toThrow(RangeError);
   });
 });
