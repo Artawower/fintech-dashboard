@@ -16,6 +16,14 @@
         <caption class="sr-only">
           Current-run market statistics for each instrument. Prices and spread are in US dollars.
         </caption>
+        <colgroup>
+          <col class="w-[18%]" />
+          <col class="w-[16%]" />
+          <col class="w-[16%]" />
+          <col class="w-[16%]" />
+          <col class="w-[16%]" />
+          <col class="w-[18%]" />
+        </colgroup>
         <thead>
           <tr>
             <th scope="col">Instrument</th>
@@ -68,7 +76,8 @@
                     {{
                       instrument.orderBookImbalance === null
                         ? '—'
-                        : ((instrument.orderBookImbalance > 0 ? '+' : '') + (instrument.orderBookImbalance | number: '1.2-2'))
+                        : (instrument.orderBookImbalance > 0 ? '+' : '') +
+                          (instrument.orderBookImbalance | number: '1.2-2')
                     }}
                   </span>
                 </td>
