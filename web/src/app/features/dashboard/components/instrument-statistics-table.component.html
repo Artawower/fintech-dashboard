@@ -11,7 +11,7 @@
       </span>
     </div>
 
-    <div class="mt-4 overflow-x-auto">
+    <div class="mt-4 overflow-x-auto [contain:layout]">
       <table
         class="table table-zebra w-full table-fixed min-w-[56rem]"
         aria-label="Live market statistics"
@@ -54,7 +54,7 @@
                 <th scope="row" class="font-semibold">
                   {{ instruments()[instrument.instrumentIndex] ?? 'Unknown instrument' }}
                 </th>
-                <td class="text-right font-mono tabular-nums">
+                <td class="text-right font-mono tabular-nums whitespace-nowrap">
                   <span
                     class="inline-block w-full"
                     [attr.aria-label]="unavailableAriaLabel(instrument.lastPriceCents)"
@@ -62,7 +62,7 @@
                     {{ instrument.lastPriceCents | centsToDollars }}
                   </span>
                 </td>
-                <td class="text-right font-mono tabular-nums">
+                <td class="text-right font-mono tabular-nums whitespace-nowrap">
                   <span
                     class="inline-block w-full"
                     [attr.aria-label]="unavailableAriaLabel(instrument.spreadCents)"
@@ -70,10 +70,10 @@
                     {{ instrument.spreadCents | centsToDollars }}
                   </span>
                 </td>
-                <td class="text-right font-mono tabular-nums">
+                <td class="text-right font-mono tabular-nums whitespace-nowrap">
                   {{ instrument.tradingVolume | number }}
                 </td>
-                <td class="text-right font-mono tabular-nums">
+                <td class="text-right font-mono tabular-nums whitespace-nowrap">
                   <span
                     class="inline-block w-full"
                     [attr.aria-label]="unavailableAriaLabel(instrument.vwapCents)"
@@ -81,7 +81,7 @@
                     {{ instrument.vwapCents | centsToDollars }}
                   </span>
                 </td>
-                <td class="text-right font-mono tabular-nums">
+                <td class="text-right font-mono tabular-nums whitespace-nowrap">
                   <span
                     class="inline-block w-full"
                     [class.text-success]="(instrument.orderBookImbalance ?? 0) > 0"
