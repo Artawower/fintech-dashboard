@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import type { WorkerInboundMessage, WorkerOutboundMessage } from '@app/core/worker/market-worker.protocol';
+import type { WorkerInboundMessage, WorkerOutboundMessage } from '../src/app/core/worker/market-worker.protocol';
 
 export class MockMarketWorker {
   public static instances: MockMarketWorker[] = [];

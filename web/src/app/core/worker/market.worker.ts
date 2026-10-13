@@ -5,6 +5,7 @@ import type { WorkerInboundMessage, WorkerOutboundMessage } from './market-worke
 import { loadWasmGenerator } from './wasm-generator.loader';
 import type { WasmMarketGenerator } from './wasm-generator.loader';
 import { MarketStatisticsAccumulator } from './market-statistics.accumulator';
+import { createSharedInstrumentMemory } from './shared-instrument-memory';
 
 let activeRunId = 0;
 let generator: WasmMarketGenerator | null = null;
@@ -75,7 +76,12 @@ async function initialize(message: Extract<WorkerInboundMessage, { type: 'INIT' 
 
     const instruments = nextGenerator.getInstruments();
     statistics = new MarketStatisticsAccumulator(instruments);
-    post({ type: 'INSTRUMENTS', runId: message.runId, instruments });
+    const sharedMemory = createSharedInstrumentMemory(instruments);
+    if (sharedMemory) {
+      post({ type: 'SHARED_INSTRUMENTS', runId: message.runId, memory: sharedMemory });
+    } else {
+      post({ type: 'INSTRUMENTS', runId: message.runId, instruments });
+    }
     post({
       type: 'STATISTICS',
       runId: message.runId,
