@@ -1,18 +1,14 @@
-export interface SharedInstrumentMemory {
-  buffer: SharedArrayBuffer;
+export interface TransferableInstrumentBuffer {
+  buffer: ArrayBuffer;
   count: number;
   slotWidth: number;
 }
 
-export function createSharedInstrumentMemory(
-  instruments: readonly string[],
-): SharedInstrumentMemory | null {
-  if (!globalThis.crossOriginIsolated || typeof SharedArrayBuffer === 'undefined') return null;
-
+export function createInstrumentBuffer(instruments: readonly string[]): TransferableInstrumentBuffer {
   const maxLength = instruments.reduce((max, instrument) => Math.max(max, instrument.length), 0);
   const slotWidth = maxLength + 1;
-  const buffer = new SharedArrayBuffer(instruments.length * slotWidth * Int32Array.BYTES_PER_ELEMENT);
-  const view = new Int32Array(buffer);
+  const buffer = new ArrayBuffer(instruments.length * slotWidth * Uint16Array.BYTES_PER_ELEMENT);
+  const view = new Uint16Array(buffer);
 
   instruments.forEach((instrument, index) => {
     const offset = index * slotWidth;
@@ -26,8 +22,8 @@ export function createSharedInstrumentMemory(
   return { buffer, count: instruments.length, slotWidth };
 }
 
-export function readSharedInstrumentMemory(memory: SharedInstrumentMemory): string[] {
-  const view = new Int32Array(memory.buffer);
+export function readInstrumentBuffer(memory: TransferableInstrumentBuffer): string[] {
+  const view = new Uint16Array(memory.buffer);
   const instruments = new Array<string>(memory.count);
 
   for (let index = 0; index < memory.count; index++) {

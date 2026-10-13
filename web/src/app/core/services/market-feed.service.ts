@@ -5,9 +5,9 @@ import type { InstrumentStatistics } from '@app/core/models/instrument-statistic
 import type { MarketSettings } from '@app/core/models/market-settings.model';
 import type { WorkerOutboundMessage } from '@app/core/worker/market-worker.protocol';
 import {
-  readSharedInstrumentMemory,
-  type SharedInstrumentMemory,
-} from '@app/core/worker/shared-instrument-memory';
+  readInstrumentBuffer,
+  type TransferableInstrumentBuffer,
+} from '@app/core/worker/instrument-buffer';
 import { SettingsService } from './settings.service';
 import { BehaviorSubject } from 'rxjs';
 
@@ -21,7 +21,7 @@ export class MarketFeedService {
   private readonly _statistics$ = new BehaviorSubject<InstrumentStatistics[]>([]);
 
   public readonly instruments = signal<readonly string[]>([]);
-  public readonly sharedInstrumentMemory = signal<SharedInstrumentMemory | null>(null);
+  public readonly instrumentBuffer = signal<TransferableInstrumentBuffer | null>(null);
   public readonly status = signal<MarketFeedStatus>('idle');
   public readonly error = signal<string | null>(null);
   public readonly statistics$ = this._statistics$.asObservable();
@@ -72,7 +72,7 @@ export class MarketFeedService {
     const runId = ++this.currentRunId;
     this.status.set('running');
     this.instruments.set([]);
-    this.sharedInstrumentMemory.set(null);
+    this.instrumentBuffer.set(null);
     this._statistics$.next([]);
     this.error.set(null);
     this.worker?.postMessage({
@@ -92,9 +92,9 @@ export class MarketFeedService {
       this.instruments.set(message.instruments);
       return;
     }
-    if (message.type === 'SHARED_INSTRUMENTS') {
-      this.sharedInstrumentMemory.set(message.memory);
-      this.instruments.set(readSharedInstrumentMemory(message.memory));
+    if (message.type === 'INSTRUMENT_BUFFER') {
+      this.instrumentBuffer.set(message.memory);
+      this.instruments.set(readInstrumentBuffer(message.memory));
       return;
     }
 

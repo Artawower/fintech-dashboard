@@ -5,7 +5,7 @@ import type { WorkerInboundMessage, WorkerOutboundMessage } from './market-worke
 import { loadWasmGenerator } from './wasm-generator.loader';
 import type { WasmMarketGenerator } from './wasm-generator.loader';
 import { MarketStatisticsAccumulator } from './market-statistics.accumulator';
-import { createSharedInstrumentMemory } from './shared-instrument-memory';
+import { createInstrumentBuffer } from './instrument-buffer';
 
 let activeRunId = 0;
 let generator: WasmMarketGenerator | null = null;
@@ -20,8 +20,8 @@ function stop(): void {
   timer = null;
 }
 
-function post(message: WorkerOutboundMessage): void {
-  postMessage(message);
+function post(message: WorkerOutboundMessage, transfer: Transferable[] = []): void {
+  postMessage(message, transfer);
 }
 
 function reportError(runId: number, error: unknown): void {
@@ -76,12 +76,11 @@ async function initialize(message: Extract<WorkerInboundMessage, { type: 'INIT' 
 
     const instruments = nextGenerator.getInstruments();
     statistics = new MarketStatisticsAccumulator(instruments);
-    const sharedMemory = createSharedInstrumentMemory(instruments);
-    if (sharedMemory) {
-      post({ type: 'SHARED_INSTRUMENTS', runId: message.runId, memory: sharedMemory });
-    } else {
-      post({ type: 'INSTRUMENTS', runId: message.runId, instruments });
-    }
+    const instrumentBuffer = createInstrumentBuffer(instruments);
+    post(
+      { type: 'INSTRUMENT_BUFFER', runId: message.runId, memory: instrumentBuffer },
+      [instrumentBuffer.buffer],
+    );
     post({
       type: 'STATISTICS',
       runId: message.runId,
