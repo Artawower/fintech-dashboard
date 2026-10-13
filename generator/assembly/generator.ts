@@ -10,6 +10,7 @@ type InstruentName = i32;
 export class Generator {
   private instruments: Array<string> = [];
   private history: Map<InstruentName, i32> = new Map();
+  private updates: MarketUpdate = new StaticArray<i32>(0);
 
   constructor(private readonly config: GeneratorConfig) {
     this.initGenerator();
@@ -36,7 +37,10 @@ export class Generator {
 
   public generate(batchSize: i32): MarketUpdate {
     const updatesLength = batchSize * MarketUpdateField.Count;
-    const updates = new StaticArray<i32>(updatesLength);
+    if (this.updates.length !== updatesLength) {
+      this.updates = new StaticArray<i32>(updatesLength);
+    }
+    const updates = this.updates;
 
     for (let i: i32 = 0; i < updatesLength; i += MarketUpdateField.Count) {
       const instrumentIndex = this.getRandomInstrumentIndex();
