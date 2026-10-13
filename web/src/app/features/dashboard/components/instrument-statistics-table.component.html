@@ -11,8 +11,11 @@
       </span>
     </div>
 
-    <div class="mt-4 overflow-x-auto">
-      <table class="table table-zebra table-fixed min-w-[56rem]" aria-label="Live market statistics">
+    <div class="mt-4 overflow-x-auto [contain:layout]">
+      <table
+        class="table table-zebra w-full table-fixed min-w-[56rem]"
+        aria-label="Live market statistics"
+      >
         <caption class="sr-only">
           Current-run market statistics for each instrument. Prices and spread are in US dollars.
         </caption>
@@ -51,26 +54,36 @@
                 <th scope="row" class="font-semibold">
                   {{ instruments()[instrument.instrumentIndex] ?? 'Unknown instrument' }}
                 </th>
-                <td class="text-right font-mono tabular-nums">
-                  <span [attr.aria-label]="unavailableAriaLabel(instrument.lastPriceCents)">
+                <td class="text-right font-mono tabular-nums whitespace-nowrap">
+                  <span
+                    class="inline-block w-full"
+                    [attr.aria-label]="unavailableAriaLabel(instrument.lastPriceCents)"
+                  >
                     {{ instrument.lastPriceCents | centsToDollars }}
                   </span>
                 </td>
-                <td class="text-right font-mono tabular-nums">
-                  <span [attr.aria-label]="unavailableAriaLabel(instrument.spreadCents)">
+                <td class="text-right font-mono tabular-nums whitespace-nowrap">
+                  <span
+                    class="inline-block w-full"
+                    [attr.aria-label]="unavailableAriaLabel(instrument.spreadCents)"
+                  >
                     {{ instrument.spreadCents | centsToDollars }}
                   </span>
                 </td>
-                <td class="text-right font-mono tabular-nums">
+                <td class="text-right font-mono tabular-nums whitespace-nowrap">
                   {{ instrument.tradingVolume | number }}
                 </td>
-                <td class="text-right font-mono tabular-nums">
-                  <span [attr.aria-label]="unavailableAriaLabel(instrument.vwapCents)">
+                <td class="text-right font-mono tabular-nums whitespace-nowrap">
+                  <span
+                    class="inline-block w-full"
+                    [attr.aria-label]="unavailableAriaLabel(instrument.vwapCents)"
+                  >
                     {{ instrument.vwapCents | centsToDollars }}
                   </span>
                 </td>
-                <td class="text-right font-mono tabular-nums">
+                <td class="text-right font-mono tabular-nums whitespace-nowrap">
                   <span
+                    class="inline-block w-full"
                     [class.text-success]="(instrument.orderBookImbalance ?? 0) > 0"
                     [class.text-error]="(instrument.orderBookImbalance ?? 0) < 0"
                     [attr.aria-label]="unavailableAriaLabel(instrument.orderBookImbalance)"
