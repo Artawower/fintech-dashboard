@@ -15,8 +15,6 @@ let statistics$: BehaviorSubject<InstrumentStatistics[]>;
 let instruments: ReturnType<typeof signal<readonly string[]>>;
 let pause: ReturnType<typeof vi.fn>;
 let resume: ReturnType<typeof vi.fn>;
-let animationFrames: Map<number, FrameRequestCallback>;
-let nextAnimationFrameId: number;
 
 function sampleStatistics(
   instrumentIndex: number,
@@ -33,22 +31,7 @@ function sampleStatistics(
   }];
 }
 
-function flushAnimationFrame(): void {
-  const callbacks = [...animationFrames.values()];
-  animationFrames.clear();
-  callbacks.forEach((callback) => callback(0));
-}
-
 beforeEach(async () => {
-  animationFrames = new Map();
-  nextAnimationFrameId = 0;
-  vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
-    const id = ++nextAnimationFrameId;
-    animationFrames.set(id, callback);
-    return id;
-  });
-  vi.stubGlobal('cancelAnimationFrame', (id: number) => animationFrames.delete(id));
-
   status = signal<MarketFeedStatus>('running');
   error = signal<string | null>(null);
   statistics$ = new BehaviorSubject<InstrumentStatistics[]>([]);
@@ -66,15 +49,14 @@ beforeEach(async () => {
     ],
   }).compileComponents();
 
+  vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
   fixture = TestBed.createComponent(DashboardPage);
-  fixture.detectChanges();
-  flushAnimationFrame();
   fixture.detectChanges();
 });
 
 afterEach(() => {
   TestBed.resetTestingModule();
-  vi.unstubAllGlobals();
+  vi.useRealTimers();
 });
 
 test('Should show the running feed and pause control', () => {
@@ -85,6 +67,7 @@ test('Should show the running feed and pause control', () => {
 
 test('Should display all market metrics for each instrument', () => {
   statistics$.next(sampleStatistics(0));
+  vi.advanceTimersByTime(200);
   fixture.detectChanges();
 
   const element = fixture.nativeElement as HTMLElement;
@@ -109,6 +92,7 @@ test('Should show unavailable prices and zero volume before the first trade', ()
     vwapCents: null,
     orderBookImbalance: null,
   }]);
+  vi.advanceTimersByTime(200);
   fixture.detectChanges();
 
   const row = (fixture.nativeElement as HTMLElement).querySelector('tbody tr');
@@ -117,20 +101,59 @@ test('Should show unavailable prices and zero volume before the first trade', ()
   expect(row?.textContent).toContain('0');
 });
 
-test('Should render the latest statistics snapshot scheduled for an animation frame', () => {
+test('Should render only the latest pending snapshot after the initial 200 ms window', () => {
   const firstSnapshot = sampleStatistics(0);
   const latestSnapshot = sampleStatistics(1, 14500);
 
   statistics$.next(firstSnapshot);
   statistics$.next(latestSnapshot);
 
-  expect(fixture.componentInstance.statistics()).toEqual(firstSnapshot);
+  expect(fixture.componentInstance.statistics()).toEqual([]);
 
-  flushAnimationFrame();
+  vi.advanceTimersByTime(199);
+  expect(fixture.componentInstance.statistics()).toEqual([]);
+
+  vi.advanceTimersByTime(1);
   fixture.detectChanges();
 
   expect(fixture.componentInstance.statistics()).toEqual(latestSnapshot);
   expect((fixture.nativeElement as HTMLElement).querySelector('tbody tr')?.textContent).toContain('BETA');
+  expect((fixture.nativeElement as HTMLElement).querySelector('tbody tr')?.textContent).toContain('$145.00');
+});
+
+test('Should render the leading snapshot immediately after an idle window and throttle subsequent snapshots', () => {
+  vi.advanceTimersByTime(200);
+  const firstSnapshot = sampleStatistics(0);
+  const latestSnapshot = sampleStatistics(1, 14500);
+
+  statistics$.next(firstSnapshot);
+  expect(fixture.componentInstance.statistics()).toEqual(firstSnapshot);
+  statistics$.next(latestSnapshot);
+
+  vi.advanceTimersByTime(199);
+  expect(fixture.componentInstance.statistics()).toEqual(firstSnapshot);
+  vi.advanceTimersByTime(1);
+  expect(fixture.componentInstance.statistics()).toEqual(latestSnapshot);
+
+  const nextSnapshot = sampleStatistics(0, 15000);
+  statistics$.next(nextSnapshot);
+  vi.advanceTimersByTime(199);
+  expect(fixture.componentInstance.statistics()).toEqual(latestSnapshot);
+  vi.advanceTimersByTime(1);
+  expect(fixture.componentInstance.statistics()).toEqual(nextSnapshot);
+});
+
+test('Should render the last pending snapshot even when the feed is paused', () => {
+  const latestSnapshot = sampleStatistics(0, 14500);
+  statistics$.next(latestSnapshot);
+  fixture.componentInstance.togglePause();
+
+  expect(status()).toBe('paused');
+  expect(fixture.componentInstance.statistics()).toEqual([]);
+  vi.advanceTimersByTime(200);
+  fixture.detectChanges();
+
+  expect(fixture.componentInstance.statistics()).toEqual(latestSnapshot);
   expect((fixture.nativeElement as HTMLElement).querySelector('tbody tr')?.textContent).toContain('$145.00');
 });
 

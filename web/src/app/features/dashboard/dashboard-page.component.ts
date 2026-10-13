@@ -2,7 +2,9 @@ import { Component, inject } from '@angular/core';
 import { MarketFeedService } from '@app/core/services/market-feed.service';
 import { InstrumentStatisticsTable } from './components/instrument-statistics-table.component';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { animationFrameScheduler, throttleTime } from 'rxjs';
+import { asyncScheduler, throttleTime } from 'rxjs';
+
+const UI_REFRESH_INTERVAL_MS = 200;
 
 @Component({
   imports: [InstrumentStatisticsTable],
@@ -14,7 +16,8 @@ export class DashboardPage {
 
   public readonly statistics = toSignal(
     this.marketFeed.statistics$.pipe(
-      throttleTime(0, animationFrameScheduler, {
+      // throttleTime(0, animationFrameScheduler, { // If we need a real time update
+      throttleTime(UI_REFRESH_INTERVAL_MS, asyncScheduler, {
         trailing: true,
         leading: true,
       }),
