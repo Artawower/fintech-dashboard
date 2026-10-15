@@ -6,6 +6,12 @@ import { SettingsService } from '@app/core/services/settings.service';
 import { SETTINGS_LIMITS } from '@app/features/settings/settings.constants';
 import { GeneratorSettings } from './generator-settings.component';
 
+const DEFAULT_FORM_SETTINGS = {
+  instrumentCount: DEFAULT_MARKET_SETTINGS.instrumentCount,
+  updatesPerBatch: DEFAULT_MARKET_SETTINGS.updatesPerBatch,
+  updateIntervalMs: DEFAULT_MARKET_SETTINGS.updateIntervalMs,
+};
+
 describe('GeneratorSettings', () => {
   let navigate: ReturnType<typeof vi.fn>;
 
@@ -24,7 +30,7 @@ describe('GeneratorSettings', () => {
     const fixture = TestBed.createComponent(GeneratorSettings);
     const component = fixture.componentInstance;
 
-    expect(component.settingsForm.getRawValue()).toEqual(DEFAULT_MARKET_SETTINGS);
+    expect(component.settingsForm.getRawValue()).toEqual(DEFAULT_FORM_SETTINGS);
     expect(component.settingsForm.valid).toBe(true);
   });
 
@@ -127,7 +133,7 @@ describe('GeneratorSettings', () => {
     form!.dispatchEvent(new Event('submit'));
 
     expect(settingsService.settings()).toEqual({
-      ...DEFAULT_MARKET_SETTINGS,
+      ...DEFAULT_FORM_SETTINGS,
       instrumentCount: 8,
     });
     expect(navigate).toHaveBeenCalledWith(['/dashboard']);

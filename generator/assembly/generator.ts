@@ -1,15 +1,14 @@
 import { GeneratorConfig } from './models';
 import { MarketUpdateField } from './market-update-layout';
-import { choice, generateInstrument, randIntRange } from './utils';
+import { direction, generateInstrument, pick, randIntRange } from './utils';
 
 // [instrumentIndex, priceCents, tradeQuantity, bidCents, askCents, bidQuantity, askQuantity]
 type MarketUpdate = StaticArray<i32>;
-type InstruentName = i32;
 
 @final
 export class Generator {
   private instruments: Array<string> = [];
-  private history: Map<InstruentName, i32> = new Map();
+  private history: Int32Array = new Int32Array(0);
   private updates: MarketUpdate = new StaticArray<i32>(0);
 
   constructor(private readonly config: GeneratorConfig) {
@@ -23,6 +22,7 @@ export class Generator {
   private initGenerator(): void {
     Math.seedRandom(this.config.seed);
     this.initInstruments();
+    this.initHistory();
   }
 
   private initInstruments(): void {
@@ -33,6 +33,10 @@ export class Generator {
     }
 
     this.instruments = instruments.values();
+  }
+
+  private initHistory(): void {
+    this.history = new Int32Array(this.instruments.length);
   }
 
   public generate(batchSize: i32): MarketUpdate {
@@ -48,7 +52,7 @@ export class Generator {
       const bidCents = this.generateNextBid(lastPriceCents);
       const spreadCents = randIntRange(this.config.minNextSpread, this.config.maxNextSpread);
       const askCents = bidCents + spreadCents;
-      const priceCents = choice([bidCents, askCents]);
+      const priceCents = pick(bidCents, askCents);
       const tradeQuantity = randIntRange(
         this.config.minTradeQuantity,
         this.config.maxTradeQuantity,
@@ -75,18 +79,17 @@ export class Generator {
   }
 
   private getLastInstrumentPrice(instrumentIndex: i32): i32 {
-    if (!this.history.has(instrumentIndex)) {
+    if (!this.history[instrumentIndex]) {
       return randIntRange(this.config.minInstrumentCentPrice, this.config.maxInstrumentCentPrice);
     }
 
-    return this.history.get(instrumentIndex);
+    return this.history[instrumentIndex];
   }
 
   private generateNextBid(price: i32): i32 {
-    const direction = choice([-1, 1]);
     const diff = randIntRange(0, this.config.maxPercentDiff);
 
-    const changeDiffCents = <f64>direction * Math.round(<f64>price * (<f64>diff / 100.0));
+    const changeDiffCents = <f64>direction() * Math.round(<f64>price * (<f64>diff / 100.0));
 
     const nextPrice = <f64>price + changeDiffCents;
     const maxBidCents = <f64>i32.MAX_VALUE - <f64>this.config.maxNextSpread;
@@ -95,6 +98,6 @@ export class Generator {
   }
 
   private saveMarketUpdate(instrumentNumber: i32, priceCents: i32): void {
-    this.history.set(instrumentNumber, priceCents);
+    this.history[instrumentNumber] = priceCents;
   }
 }

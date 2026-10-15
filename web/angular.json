@@ -76,7 +76,10 @@
           "defaultConfiguration": "development"
         },
         "test": {
-          "builder": "@angular/build:unit-test"
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "buildTarget": "fintech-dashboard:build:production"
+          }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
