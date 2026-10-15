@@ -22,7 +22,7 @@ export class DashboardPage {
         leading: true,
       }),
     ),
-    { initialValue: [] },
+    { initialValue: new Float64Array() },
   );
 
   public togglePause(): void {

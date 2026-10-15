@@ -8,7 +8,7 @@ import { MarketStatisticsAccumulator } from './market-statistics.accumulator';
 
 let activeRunId = 0;
 let generator: WasmMarketGenerator | null = null;
-let statistics: MarketStatisticsAccumulator | null = null;
+let marketStatistisAccumulator: MarketStatisticsAccumulator | null = null;
 let timer: ReturnType<typeof setInterval> | null = null;
 let paused = false;
 let settings: MarketSettings | null = null;
@@ -19,7 +19,11 @@ function stop(): void {
   timer = null;
 }
 
-function post(message: WorkerOutboundMessage): void {
+function post(message: WorkerOutboundMessage, transfer?: Transferable[]): void {
+  if (transfer) {
+    postMessage(message, transfer);
+    return;
+  }
   postMessage(message);
 }
 
@@ -33,15 +37,19 @@ function reportError(runId: number, error: unknown): void {
 }
 
 function generateBatch(runId: number): void {
-  if (runId !== activeRunId || !generator || !statistics || !settings) return;
+  if (runId !== activeRunId || !generator || !marketStatistisAccumulator || !settings) return;
 
   try {
     const updates = generator.generate(settings.updatesPerBatch);
-    post({
-      type: 'STATISTICS',
-      runId,
-      statistics: statistics.processBatch(updates),
-    });
+    const statistics = marketStatistisAccumulator.processBatch(updates);
+    post(
+      {
+        type: 'STATISTICS',
+        runId,
+        statistics,
+      },
+      // [statistics.buffer],
+    );
   } catch (error) {
     stop();
     reportError(runId, error);
@@ -50,7 +58,7 @@ function generateBatch(runId: number): void {
 
 function start(): void {
   stop();
-  if (paused || !generator || !statistics || !settings) return;
+  if (paused || !generator || !marketStatistisAccumulator || !settings) return;
 
   const runId = activeRunId;
   timer = setInterval(() => generateBatch(runId), settings.updateIntervalMs);
@@ -62,7 +70,7 @@ async function initialize(message: Extract<WorkerInboundMessage, { type: 'INIT' 
   activeRunId = message.runId;
   paused = false;
   generator = null;
-  statistics = null;
+  marketStatistisAccumulator = null;
   settings = message.settings;
   stop();
 
@@ -74,12 +82,12 @@ async function initialize(message: Extract<WorkerInboundMessage, { type: 'INIT' 
     generator = nextGenerator;
 
     const instruments = nextGenerator.getInstruments();
-    statistics = new MarketStatisticsAccumulator(instruments);
+    marketStatistisAccumulator = new MarketStatisticsAccumulator(instruments);
     post({ type: 'INSTRUMENTS', runId: message.runId, instruments });
     post({
       type: 'STATISTICS',
       runId: message.runId,
-      statistics: statistics.processBatch(new Uint32Array(0)),
+      statistics: marketStatistisAccumulator.processBatch(new Uint32Array(0)),
     });
     start();
   } catch (error) {

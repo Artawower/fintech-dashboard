@@ -14,7 +14,7 @@ export class MarketFeedService {
   private worker: Worker | null = null;
   private currentRunId = 0;
 
-  private readonly _statistics$ = new BehaviorSubject<InstrumentStatistics[]>([]);
+  private readonly _statistics$ = new BehaviorSubject<InstrumentStatistics | null>(null);
 
   public readonly instruments = signal<readonly string[]>([]);
   public readonly status = signal<MarketFeedStatus>('idle');
@@ -67,7 +67,7 @@ export class MarketFeedService {
     const runId = ++this.currentRunId;
     this.status.set('running');
     this.instruments.set([]);
-    this._statistics$.next([]);
+    this._statistics$.next(null);
     this.error.set(null);
     this.worker?.postMessage({
       type: 'INIT',

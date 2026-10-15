@@ -4,9 +4,9 @@ import { Environment } from './environment.type';
 export const environment: Environment = {
   uiRefreshInterval: 200,
 
-  instrumentCount: 500,
-  updatesPerBatch: 10000,
-  updateIntervalMs: 30,
+  instrumentCount: 50,
+  updatesPerBatch: 1000,
+  updateIntervalMs: 50,
 
-  hideTable: true, // Better profiling
+  hideTable: false, // Better profiling
 };

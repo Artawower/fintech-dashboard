@@ -1,3 +1,5 @@
+@let snapshot = statistics();
+
 <section class="card bg-base-100 shadow" aria-labelledby="statistics-title">
   <div class="card-body p-0 sm:p-6">
     <div class="flex items-center justify-between gap-4 px-4 pt-4 sm:px-0 sm:pt-0">
@@ -6,8 +8,8 @@
         <p class="text-sm text-base-content/70">Latest prices and cumulative trading metrics.</p>
       </div>
       <span class="badge badge-ghost shrink-0">
-        {{ statistics().length }}
-        {{ statistics().length === 1 ? 'instrument' : 'instruments' }}
+        {{ instrumentCount() }}
+        {{ instrumentCount() === 1 ? 'instrument' : 'instruments' }}
       </span>
     </div>
 
@@ -38,7 +40,7 @@
           </tr>
         </thead>
         <tbody>
-          @if (statistics().length === 0) {
+          @if (snapshot === null || snapshot.length === 0) {
             <tr>
               <td colspan="6" class="py-10 text-center text-base-content/60" role="status">
                 @if (error()) {
@@ -49,50 +51,56 @@
               </td>
             </tr>
           } @else {
-            @for (instrument of statistics(); track instrument.instrumentIndex) {
+            @for (offset of offsets(); track offset) {
+              @let lastPriceCents = availableValue(snapshot[offset + fields.LastPriceCents]);
+              @let spreadCents = availableValue(snapshot[offset + fields.SpreadCents]);
+              @let vwapCents = availableValue(snapshot[offset + fields.VwapCents]);
+              @let orderBookImbalance =
+                availableValue(snapshot[offset + fields.OrderBookImbalance]);
+
               <tr>
                 <th scope="row" class="font-semibold">
-                  {{ instruments()[instrument.instrumentIndex] ?? 'Unknown instrument' }}
+                  {{ instruments()[offset / fields.Count] ?? 'Unknown instrument' }}
                 </th>
                 <td class="text-right font-mono tabular-nums whitespace-nowrap">
                   <span
                     class="inline-block w-full"
-                    [attr.aria-label]="unavailableAriaLabel(instrument.lastPriceCents)"
+                    [attr.aria-label]="unavailableAriaLabel(lastPriceCents)"
                   >
-                    {{ instrument.lastPriceCents | centsToDollars }}
+                    {{ lastPriceCents | centsToDollars }}
                   </span>
                 </td>
                 <td class="text-right font-mono tabular-nums whitespace-nowrap">
                   <span
                     class="inline-block w-full"
-                    [attr.aria-label]="unavailableAriaLabel(instrument.spreadCents)"
+                    [attr.aria-label]="unavailableAriaLabel(spreadCents)"
                   >
-                    {{ instrument.spreadCents | centsToDollars }}
+                    {{ spreadCents | centsToDollars }}
                   </span>
                 </td>
                 <td class="text-right font-mono tabular-nums whitespace-nowrap">
-                  {{ instrument.tradingVolume | number }}
+                  {{ snapshot[offset + fields.TradingVolume] | number }}
                 </td>
                 <td class="text-right font-mono tabular-nums whitespace-nowrap">
                   <span
                     class="inline-block w-full"
-                    [attr.aria-label]="unavailableAriaLabel(instrument.vwapCents)"
+                    [attr.aria-label]="unavailableAriaLabel(vwapCents)"
                   >
-                    {{ instrument.vwapCents | centsToDollars }}
+                    {{ vwapCents | centsToDollars }}
                   </span>
                 </td>
                 <td class="text-right font-mono tabular-nums whitespace-nowrap">
                   <span
                     class="inline-block w-full"
-                    [class.text-success]="(instrument.orderBookImbalance ?? 0) > 0"
-                    [class.text-error]="(instrument.orderBookImbalance ?? 0) < 0"
-                    [attr.aria-label]="unavailableAriaLabel(instrument.orderBookImbalance)"
+                    [class.text-success]="(orderBookImbalance ?? 0) > 0"
+                    [class.text-error]="(orderBookImbalance ?? 0) < 0"
+                    [attr.aria-label]="unavailableAriaLabel(orderBookImbalance)"
                   >
                     {{
-                      instrument.orderBookImbalance === null
+                      orderBookImbalance === null
                         ? '—'
-                        : (instrument.orderBookImbalance &gt; 0 ? '+' : '') +
-                          (instrument.orderBookImbalance | number: '1.2-2')
+                        : (orderBookImbalance &gt; 0 ? '+' : '') +
+                          (orderBookImbalance | number: '1.2-2')
                     }}
                   </span>
                 </td>

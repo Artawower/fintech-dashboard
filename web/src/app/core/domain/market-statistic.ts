@@ -1,5 +1,3 @@
-import type { InstrumentStatistics } from '@app/core/models/instrument-statistics.model';
-
 export class InstrumentMismatchError extends Error {
   public constructor(updateInstrument: number, statisticsInstrument: number) {
     super(
@@ -15,30 +13,29 @@ export class InvalidPriceRange extends Error {
   }
 }
 
-function assertIntegers(...values: number[]): void {
-  const invalidValues = values.filter((value) => !Number.isSafeInteger(value));
-  if (invalidValues.length) {
-    throw new RangeError(`Values must be safe integers: ${invalidValues.join(', ')}.`);
+function assertInteger(value: number): void {
+  if (!Number.isSafeInteger(value)) {
+    throw new RangeError(`Value must be a safe integer: ${value}.`);
   }
 }
 
-function assertNonNegative(...values: number[]): void {
-  const invalidValues = values.filter((value) => value < 0);
-  if (invalidValues.length) {
-    throw new RangeError(`Values must be non-negative: ${invalidValues.join(', ')}.`);
+function assertNonNegative(value: number): void {
+  if (value < 0) {
+    throw new RangeError(`Value must be non-negative: ${value}.`);
   }
 }
 
-function assertPositive(...values: number[]): void {
-  const invalidValues = values.filter((value) => value <= 0);
-  if (invalidValues.length) {
-    throw new RangeError(`Values must be positive: ${invalidValues.join(', ')}.`);
+function assertPositive(value: number): void {
+  if (value <= 0) {
+    throw new RangeError(`Value must be positive: ${value}.`);
   }
 }
 
 export function calculateBidAskSpread(bidPrice: number, askPrice: number): number {
-  assertIntegers(bidPrice, askPrice);
-  assertPositive(bidPrice, askPrice);
+  assertInteger(bidPrice);
+  assertInteger(askPrice);
+  assertPositive(bidPrice);
+  assertPositive(askPrice);
 
   if (bidPrice >= askPrice) {
     throw new InvalidPriceRange(bidPrice, askPrice);
@@ -47,12 +44,13 @@ export function calculateBidAskSpread(bidPrice: number, askPrice: number): numbe
 }
 
 export function sumTradingVolume(currentVolume: number, tradeQuantity: number): number {
-  assertIntegers(currentVolume, tradeQuantity);
+  assertInteger(currentVolume);
+  assertInteger(tradeQuantity);
   assertNonNegative(currentVolume);
   assertPositive(tradeQuantity);
 
   const totalVolume = currentVolume + tradeQuantity;
-  assertIntegers(totalVolume);
+  assertInteger(totalVolume);
   assertNonNegative(totalVolume);
   return totalVolume;
 }
@@ -63,8 +61,10 @@ export function sumTradingVolume(currentVolume: number, tradeQuantity: number): 
  * since the current run started. Larger trades contribute more.
  */
 export function calculateVWAP(totalTradeValue: number, totalTradeQuantity: number): number | null {
-  assertIntegers(totalTradeValue, totalTradeQuantity);
-  assertNonNegative(totalTradeValue, totalTradeQuantity);
+  assertInteger(totalTradeValue);
+  assertInteger(totalTradeQuantity);
+  assertNonNegative(totalTradeValue);
+  assertNonNegative(totalTradeQuantity);
 
   if (totalTradeQuantity === 0) {
     return null;
@@ -82,61 +82,17 @@ export function calculateOrderBookImbalance(
   bidQuantity: number,
   askQuantity: number,
 ): number | null {
-  assertIntegers(bidQuantity, askQuantity);
-  assertNonNegative(bidQuantity, askQuantity);
+  assertInteger(bidQuantity);
+  assertInteger(askQuantity);
+  assertNonNegative(bidQuantity);
+  assertNonNegative(askQuantity);
 
   const totalQuantity = bidQuantity + askQuantity;
-  assertIntegers(totalQuantity);
+  assertInteger(totalQuantity);
 
   if (totalQuantity === 0) {
     return null;
   }
 
   return (bidQuantity - askQuantity) / totalQuantity;
-}
-
-export function createInstrumentStatistics(instrumentIndex: number): InstrumentStatistics {
-  return {
-    instrumentIndex,
-    lastPriceCents: null,
-    spreadCents: null,
-    tradingVolume: 0,
-    totalTradeValue: 0,
-    vwapCents: null,
-    orderBookImbalance: null,
-  };
-}
-
-export function updateInstrumentStatistics(
-  current: InstrumentStatistics,
-  instrumentIndex: number,
-  priceCents: number,
-  tradeQuantity: number,
-  bidCents: number,
-  askCents: number,
-  bidQuantity: number,
-  askQuantity: number,
-): InstrumentStatistics {
-  if (current.instrumentIndex !== instrumentIndex) {
-    throw new InstrumentMismatchError(instrumentIndex, current.instrumentIndex);
-  }
-
-  assertIntegers(current.totalTradeValue, priceCents);
-  assertNonNegative(current.totalTradeValue);
-  assertPositive(priceCents);
-  const spreadCents = calculateBidAskSpread(bidCents, askCents);
-  const tradingVolume = sumTradingVolume(current.tradingVolume, tradeQuantity);
-  const totalTradeValue = current.totalTradeValue + priceCents * tradeQuantity;
-  assertIntegers(totalTradeValue);
-  assertNonNegative(totalTradeValue);
-
-  return {
-    instrumentIndex,
-    lastPriceCents: priceCents,
-    spreadCents,
-    tradingVolume,
-    totalTradeValue,
-    vwapCents: calculateVWAP(totalTradeValue, tradingVolume),
-    orderBookImbalance: calculateOrderBookImbalance(bidQuantity, askQuantity),
-  };
 }

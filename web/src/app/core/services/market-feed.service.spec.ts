@@ -4,6 +4,7 @@ import { DEFAULT_MARKET_SETTINGS } from '@app/core/constants';
 import type { InstrumentStatistics } from '@app/core/models/instrument-statistics.model';
 import type { MarketSettings } from '@app/core/models/market-settings.model';
 import { MockMarketWorker } from '@test-utils/mock-market-worker';
+import { createStatisticsSnapshot } from '@test-utils/statistics-snapshot';
 import { MarketFeedService } from './market-feed.service';
 import { SettingsService } from './settings.service';
 
@@ -12,16 +13,17 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-function sampleStatistics(): InstrumentStatistics[] {
-  return [{
-    instrumentIndex: 0,
-    lastPriceCents: 100,
-    spreadCents: 2,
-    tradingVolume: 2,
-    totalTradeValue: 200,
-    vwapCents: 100,
-    orderBookImbalance: 0,
-  }];
+function sampleStatistics(): InstrumentStatistics {
+  return createStatisticsSnapshot([
+    {
+      lastPriceCents: 100,
+      spreadCents: 2,
+      tradingVolume: 2,
+      totalTradeValue: 200,
+      vwapCents: 100,
+      orderBookImbalance: 0,
+    },
+  ]);
 }
 
 function setup() {
@@ -60,31 +62,35 @@ test('MarketFeedService stores instrument labels only for the active run', () =>
 
 test('MarketFeedService emits statistics and clears them when settings change', () => {
   const { worker, service, settings } = setup();
-  const snapshots: InstrumentStatistics[][] = [];
+  const snapshots: (InstrumentStatistics | null)[] = [];
   const subscription = service.statistics$.subscribe((statistics) => snapshots.push(statistics));
   const statistics = sampleStatistics();
   worker.emit({ type: 'STATISTICS', runId: 1, statistics });
 
-  const nextSettings: MarketSettings = { instrumentCount: 8, updatesPerBatch: 50, updateIntervalMs: 100 };
+  const nextSettings: MarketSettings = {
+    instrumentCount: 8,
+    updatesPerBatch: 50,
+    updateIntervalMs: 100,
+  };
   settings.updateSettings(nextSettings);
 
   expect(worker.posted.at(-1)).toMatchObject({ type: 'INIT', runId: 2, settings: nextSettings });
-  expect(snapshots).toEqual([[], statistics, []]);
+  expect(snapshots).toEqual([null, statistics, null]);
   subscription.unsubscribe();
 });
 
 test('MarketFeedService ignores statistics from superseded runs', () => {
   const { worker, service, settings } = setup();
-  const snapshots: InstrumentStatistics[][] = [];
+  const snapshots: (InstrumentStatistics | null)[] = [];
   const subscription = service.statistics$.subscribe((statistics) => snapshots.push(statistics));
   settings.updateSettings({ instrumentCount: 8, updatesPerBatch: 50, updateIntervalMs: 100 });
   const statistics = sampleStatistics();
 
   worker.emit({ type: 'STATISTICS', runId: 1, statistics });
-  expect(snapshots).toEqual([[], []]);
+  expect(snapshots).toEqual([null, null]);
 
   worker.emit({ type: 'STATISTICS', runId: 2, statistics });
-  expect(snapshots).toEqual([[], [], statistics]);
+  expect(snapshots).toEqual([null, null, statistics]);
   subscription.unsubscribe();
 });
 

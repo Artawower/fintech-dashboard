@@ -8,5 +8,5 @@ export type WorkerInboundMessage =
 
 export type WorkerOutboundMessage =
   | { type: 'INSTRUMENTS'; runId: number; instruments: string[] }
-  | { type: 'STATISTICS'; runId: number; statistics: InstrumentStatistics[] }
+  | { type: 'STATISTICS'; runId: number; statistics: InstrumentStatistics }
   | { type: 'ERROR'; runId: number; error: string };
