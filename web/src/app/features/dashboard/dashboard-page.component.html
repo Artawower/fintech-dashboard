@@ -36,9 +36,11 @@
     </div>
   }
 
-  <app-instrument-statistics-table
-    [statistics]="statistics()"
-    [instruments]="marketFeed.instruments()"
-    [error]="marketFeed.error()"
-  />
+  @if (!environment.hideTable) {
+    <app-instrument-statistics-table
+      [statistics]="statistics()"
+      [instruments]="marketFeed.instruments()"
+      [error]="marketFeed.error()"
+    />
+  }
 </main>
