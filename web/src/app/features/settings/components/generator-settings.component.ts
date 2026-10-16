@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NumberField } from '@app/shared/components/number-field.component';
@@ -50,6 +50,12 @@ export class GeneratorSettings {
   });
 
   protected readonly controls = this.settingsForm.controls;
+
+  public constructor() {
+    effect(() => {
+      this.settingsForm.patchValue(this.settingsService.settings());
+    });
+  }
 
   protected applySettings(): void {
     if (this.settingsForm.invalid) {

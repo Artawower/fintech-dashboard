@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { afterEach, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { DEFAULT_MARKET_SETTINGS } from '@app/core/constants';
 import type { InstrumentStatistics } from '@app/core/models/instrument-statistics.model';
 import type { MarketSettings } from '@app/core/models/market-settings.model';
@@ -7,8 +7,12 @@ import { MockMarketWorker } from '@test-utils/mock-market-worker';
 import { createStatisticsSnapshot } from '@test-utils/statistics-snapshot';
 import { MarketFeedService } from './market-feed.service';
 import { SettingsService } from './settings.service';
+import { MARKET_SETTINGS_STORAGE_KEY } from '@app/core/settings.constants';
+
+beforeEach(() => localStorage.removeItem(MARKET_SETTINGS_STORAGE_KEY));
 
 afterEach(() => {
+  localStorage.removeItem(MARKET_SETTINGS_STORAGE_KEY);
   TestBed.resetTestingModule();
   vi.unstubAllGlobals();
 });

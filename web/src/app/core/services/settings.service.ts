@@ -1,4 +1,4 @@
-import { Service } from '@angular/core';
+import { DestroyRef, inject, Service } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { BehaviorSubject } from 'rxjs';
 import { DEFAULT_MARKET_SETTINGS } from '@app/core/constants';
@@ -7,13 +7,27 @@ import { MARKET_SETTINGS_STORAGE_KEY } from '@app/core/settings.constants';
 
 @Service()
 export class SettingsService {
+  private readonly destroyRef = inject(DestroyRef);
   private readonly settingsSubject$ = new BehaviorSubject<MarketSettings>(this.loadSettings());
+  private readonly handleStorageChange = (event: StorageEvent): void => {
+    console.log('✎: [line 13][settings.service.ts] event: ', event);
+    if (event.key !== null && event.key !== MARKET_SETTINGS_STORAGE_KEY) return;
+
+    this.settingsSubject$.next(this.loadSettings());
+  };
 
   public readonly settings$ = this.settingsSubject$.asObservable();
 
   public readonly settings = toSignal(this.settings$, {
     requireSync: true,
   });
+
+  public constructor() {
+    window.addEventListener('storage', this.handleStorageChange);
+    this.destroyRef.onDestroy(() =>
+      window.removeEventListener('storage', this.handleStorageChange),
+    );
+  }
 
   public get currentSettings(): MarketSettings {
     return this.settingsSubject$.value;
@@ -44,5 +58,4 @@ export class SettingsService {
       return DEFAULT_MARKET_SETTINGS;
     }
   }
-
 }

@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { vi } from 'vitest';
 import { DEFAULT_MARKET_SETTINGS } from '@app/core/constants';
 import { SettingsService } from '@app/core/services/settings.service';
-import { SETTINGS_LIMITS } from '@app/features/settings/settings.constants';
+import { MARKET_SETTINGS_STORAGE_KEY, SETTINGS_LIMITS } from '@app/core/settings.constants';
 import { GeneratorSettings } from './generator-settings.component';
 
 const DEFAULT_FORM_SETTINGS = {
@@ -16,6 +16,7 @@ describe('GeneratorSettings', () => {
   let navigate: ReturnType<typeof vi.fn>;
 
   beforeEach(async () => {
+    localStorage.removeItem(MARKET_SETTINGS_STORAGE_KEY);
     navigate = vi.fn().mockResolvedValue(true);
     await TestBed.configureTestingModule({
       imports: [GeneratorSettings],
@@ -24,7 +25,10 @@ describe('GeneratorSettings', () => {
     TestBed.inject(SettingsService).resetToDefault();
   });
 
-  afterEach(() => vi.restoreAllMocks());
+  afterEach(() => {
+    vi.restoreAllMocks();
+    localStorage.removeItem(MARKET_SETTINGS_STORAGE_KEY);
+  });
 
   it('should initialize with the default market settings', () => {
     const fixture = TestBed.createComponent(GeneratorSettings);
@@ -36,6 +40,7 @@ describe('GeneratorSettings', () => {
 
   it('should reject values outside the configured limits', () => {
     const fixture = TestBed.createComponent(GeneratorSettings);
+    fixture.detectChanges();
     const controls = fixture.componentInstance.settingsForm.controls;
 
     controls.instrumentCount.setValue(SETTINGS_LIMITS.instrumentCount.max + 1);
@@ -60,6 +65,7 @@ describe('GeneratorSettings', () => {
 
   it('should reject non-integer (fractional) settings', () => {
     const fixture = TestBed.createComponent(GeneratorSettings);
+    fixture.detectChanges();
     const controls = fixture.componentInstance.settingsForm.controls;
 
     controls.instrumentCount.setValue(5.5);
@@ -141,6 +147,7 @@ describe('GeneratorSettings', () => {
 
   it('should not navigate when invalid settings are applied', () => {
     const fixture = TestBed.createComponent(GeneratorSettings);
+    fixture.detectChanges();
     fixture.componentInstance.settingsForm.controls.instrumentCount.setValue(
       SETTINGS_LIMITS.instrumentCount.max + 1,
     );

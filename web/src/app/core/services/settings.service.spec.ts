@@ -1,8 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { DEFAULT_MARKET_SETTINGS } from '@app/core/constants';
 import { MarketSettings } from '@app/core/models/market-settings.model';
 import { SettingsService } from './settings.service';
+import { MARKET_SETTINGS_STORAGE_KEY } from '@app/core/settings.constants';
+
+beforeEach(() => localStorage.removeItem(MARKET_SETTINGS_STORAGE_KEY));
+afterEach(() => localStorage.removeItem(MARKET_SETTINGS_STORAGE_KEY));
 
 describe('SettingsService', () => {
   it('should initialize with default market settings in signal and getter', () => {
