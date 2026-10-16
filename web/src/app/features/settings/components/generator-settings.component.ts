@@ -5,7 +5,7 @@ import { NumberField } from '@app/shared/components/number-field.component';
 import { integerValidator } from '@app/shared/validators/integer.validator';
 import { SettingsService } from '@app/core/services/settings.service';
 import { MarketSettings } from '@app/core/models/market-settings.model';
-import { SETTINGS_LIMITS } from '@app/features/settings/settings.constants';
+import { SETTINGS_LIMITS } from '@app/core/settings.constants';
 
 @Component({
   imports: [ReactiveFormsModule, NumberField],
